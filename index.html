@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Gym Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#191919" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Gym Tracker">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%232783DE'/%3E%3Crect x='38' y='78' width='104' height='24' rx='8' fill='white'/%3E%3Crect x='26' y='60' width='20' height='60' rx='7' fill='white'/%3E%3Crect x='134' y='60' width='20' height='60' rx='7' fill='white'/%3E%3C/svg%3E">
+<style>
+:root{
+  --canvas:#ffffff; --soft:#f9f8f7; --soft2:#f0efed; --border:#e6e5e3;
+  --text:#2c2c2b; --muted:#7d7a75;
+  --blue:#2783de; --blue-soft:#e5f2fc;
+  --green:#46a171; --green-soft:#e8f1ec;
+  --orange:#d5803b; --orange-soft:#fbebde;
+  --red:#e56458; --red-soft:#fce9e7;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --canvas:#191919; --soft:#202020; --soft2:#383836; --border:rgba(255,255,255,.2);
+    --text:#ffffff; --muted:rgba(255,255,255,.65);
+    --blue:#5e9fe8; --blue-soft:rgba(94,159,232,.12);
+    --green:#72bc8f; --green-soft:rgba(114,188,143,.12);
+    --orange:#de9255; --orange-soft:rgba(222,146,85,.12);
+    --red:#e97366; --red-soft:rgba(233,115,102,.12);
+    --shadow:none;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--canvas);color:var(--text)}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+#app{max-width:480px;margin:0 auto;min-height:100vh;padding:0 16px calc(96px + env(safe-area-inset-bottom));}
+header.top{position:sticky;top:0;z-index:20;background:var(--canvas);padding:calc(12px + env(safe-area-inset-top)) 0 10px;border-bottom:1px solid var(--border)}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:15px;font-weight:800;letter-spacing:.06em}
+.brand span{color:var(--blue)}
+.top-meta{font-size:13px;color:var(--muted);white-space:nowrap}
+h1{font-size:26px;line-height:1.2;font-weight:750;margin:20px 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+section{margin-bottom:16px}
+.card{background:var(--canvas);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.card.soft{background:var(--soft);box-shadow:none}
+.card + .card{margin-top:12px}
+.card h2{font-size:17px;font-weight:700;margin:0 0 4px}
+.card p.hint{margin:0;color:var(--muted);font-size:14px}
+.row{display:flex;align-items:center;gap:12px}
+.row.between{justify-content:space-between}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.tile b{display:block;font-size:22px;font-weight:750;line-height:1.2}
+.tile span{font-size:13px;color:var(--muted)}
+label.field{display:block;margin-bottom:12px}
+label.field > span{display:block;font-size:13px;font-weight:650;color:var(--muted);margin-bottom:6px}
+select,input[type=text],input[type=number]{
+  width:100%;min-height:48px;padding:12px 14px;font-size:16px;font-family:inherit;color:var(--text);
+  background:var(--canvas);border:1px solid var(--border);border-radius:10px;appearance:none;
+}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.stepper{display:grid;grid-template-columns:52px 1fr 52px;gap:8px;align-items:center}
+.stepper button{
+  min-height:52px;min-width:52px;font-size:22px;font-weight:700;border-radius:12px;
+  border:1px solid var(--border);background:var(--soft);color:var(--text);cursor:pointer
+}
+.stepper button:active{background:var(--soft2)}
+.stepper .val{text-align:center;border:1px solid var(--border);border-radius:12px;min-height:52px;
+  display:flex;flex-direction:column;justify-content:center;background:var(--canvas)}
+.stepper .val b{font-size:20px;font-weight:750;line-height:1.1}
+.stepper .val span{font-size:11px;color:var(--muted)}
+button.btn{
+  width:100%;min-height:52px;padding:14px 18px;font-size:16px;font-weight:700;font-family:inherit;
+  border-radius:12px;border:1px solid var(--border);background:var(--canvas);color:var(--text);cursor:pointer
+}
+button.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+button.btn.danger{color:var(--red);border-color:var(--red)}
+button.btn.ghost{background:var(--soft)}
+button.btn:disabled{opacity:.45;cursor:default}
+.btn-row{display:flex;gap:10px}
+.btn-row > *{flex:1}
+.note{background:var(--blue-soft);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--text)}
+.note.warn{background:var(--orange-soft)}
+.note.ok{background:var(--green-soft)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.red{background:var(--red-soft);color:var(--red)}
+.pill.orange{background:var(--orange-soft);color:var(--orange)}
+.pill.green{background:var(--green-soft);color:var(--green)}
+.setlist{list-style:none;margin:12px 0 0;padding:0}
+.setlist li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border);font-size:15px}
+.setlist li .idx{width:24px;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.setlist li .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.setlist li .num{font-variant-numeric:tabular-nums;font-weight:650}
+.setlist li button{width:44px;height:44px;border:none;background:transparent;color:var(--muted);font-size:18px;cursor:pointer;border-radius:10px}
+.ring-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.ring{position:relative;width:180px;height:180px}
+.ring svg{transform:rotate(-90deg)}
+.ring .time{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:750;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;color:var(--muted);font-weight:700;padding:0 0 8px}
+th.num{text-align:right;padding-left:10px;white-space:nowrap}
+td{padding:10px 0;border-top:1px solid var(--border);vertical-align:middle}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
+td.pillcell{text-align:right;white-space:nowrap;width:1px;padding-left:12px}
+nav.tabs{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--canvas);border-top:1px solid var(--border);
+  padding:6px 8px calc(6px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:2px
+}
+nav.tabs .inner{display:flex;width:100%;max-width:480px}
+nav.tabs button{
+  flex:1;min-height:56px;border:none;background:transparent;color:var(--muted);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:inherit;
+  font-size:11px;font-weight:650;border-radius:12px
+}
+nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button[aria-current="true"]{color:var(--blue);background:var(--blue-soft)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block}
+.overlay{position:fixed;inset:0;z-index:50;background:var(--canvas);overflow-y:auto;padding:0 16px calc(24px + env(safe-area-inset-bottom))}
+.overlay .inner{max-width:480px;margin:0 auto}
+.chart{width:100%;height:190px;display:block}
+.chart .grid{stroke:var(--border);stroke-width:1}
+.chart .line{stroke:var(--blue);stroke-width:2.5;fill:none;stroke-linejoin:round}
+.chart .area{fill:var(--blue-soft)}
+.chart .pt{fill:var(--blue)}
+.chart text{fill:var(--muted);font-size:10px}
+.empty{color:var(--muted);font-size:14px;text-align:center;padding:24px 8px}
+.filebtn{position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+@media (prefers-reduced-motion: no-preference){
+  .ring circle.prog{transition:stroke-dashoffset .4s linear}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav class="tabs" id="tabs"></nav>
+<div id="overlay"></div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   1. СПРАВОЧНИКИ (точно так же, как в десктопной версии на Python)
+   ===================================================================== */
+const CATS = {
+  compound_barbell:      {label:"Штанга (компаунд)",       repLow:5,  repHigh:8,  step:2.5, rest:"base"},
+  compound_barbell_leg:  {label:"Штанга, ноги/спина",      repLow:5,  repHigh:8,  step:5.0, rest:"base"},
+  compound_dumbbell:     {label:"Гантели (компаунд)",      repLow:8,  repHigh:12, step:2.0, rest:"base"},
+  compound_cable_machine:{label:"Блок/тренажёр (компаунд)",repLow:8, repHigh:12, step:5.0, rest:"base"},
+  compound_bodyweight:   {label:"Свой вес (компаунд)",     repLow:6,  repHigh:12, step:2.5, rest:"base"},
+  isolation_dumbbell:    {label:"Гантели (изоляция)",      repLow:10, repHigh:15, step:1.0, rest:"iso"},
+  isolation_barbell:     {label:"Штанга (изоляция)",       repLow:8,  repHigh:12, step:2.5, rest:"iso"},
+  isolation_cable_machine:{label:"Блок/тренажёр (изоляция)",repLow:10,repHigh:15, step:2.5, rest:"iso"}
+};
+
+const CATALOG = {
+  "Жим штанги лёжа":"compound_barbell",
+  "Жим штанги на наклонной скамье":"compound_barbell",
+  "Присед со штангой":"compound_barbell_leg",
+  "Становая тяга":"compound_barbell_leg",
+  "Румынская становая тяга":"compound_barbell_leg",
+  "Жим штанги стоя (армейский)":"compound_barbell",
+  "Тяга штанги в наклоне":"compound_barbell",
+  "Жим гантелей лёжа":"compound_dumbbell",
+  "Жим гантелей на наклонной скамье":"compound_dumbbell",
+  "Жим гантелей сидя (плечи)":"compound_dumbbell",
+  "Тяга гантели в наклоне одной рукой":"compound_dumbbell",
+  "Выпады с гантелями":"compound_dumbbell",
+  "Жим ногами в тренажёре":"compound_cable_machine",
+  "Тяга верхнего блока":"compound_cable_machine",
+  "Тяга нижнего блока (горизонтальная тяга)":"compound_cable_machine",
+  "Гакк-присед в тренажёре":"compound_cable_machine",
+  "Подтягивания":"compound_bodyweight",
+  "Отжимания на брусьях":"compound_bodyweight",
+  "Отжимания от пола":"compound_bodyweight",
+  "Подъём штанги на бицепс":"isolation_barbell",
+  "Французский жим штанги лёжа":"isolation_barbell",
+  "Подъём гантелей на бицепс":"isolation_dumbbell",
+  "Разведение гантелей в стороны (дельты)":"isolation_dumbbell",
+  "Разведение гантелей лёжа":"isolation_dumbbell",
+  "Французский жим с гантелью":"isolation_dumbbell",
+  "Разгибание рук на блоке (трицепс)":"isolation_cable_machine",
+  "Сгибание рук на блоке (бицепс)":"isolation_cable_machine",
+  "Разведение в тренажёре (пек-дек)":"isolation_cable_machine",
+  "Сгибание ног в тренажёре":"isolation_cable_machine",
+  "Разгибание ног в тренажёре":"isolation_cable_machine",
+  "Подъём на носки (икры)":"isolation_cable_machine",
+  "Гиперэкстензия":"compound_bodyweight"
+};
+const DEFAULT_CATEGORY = "compound_barbell";
+
+const EQUIP_BY_CAT = {
+  compound_barbell:"barbell", compound_barbell_leg:"barbell", isolation_barbell:"barbell",
+  compound_dumbbell:"dumbbell", isolation_dumbbell:"dumbbell",
+  compound_cable_machine:"machine", isolation_cable_machine:"machine",
+  compound_bodyweight:"bodyweight"
+};
+const EQUIP_LABEL = {barbell:"Штанга", dumbbell:"Гантели", machine:"Блок / тренажёр", bodyweight:"Свой вес (доп. вес)"};
+const EQUIP_HINT = {
+  barbell:"Минимальный шаг = два самых лёгких блина (часто 2×1.25 = 2.5 кг)",
+  dumbbell:"Шаг между соседними гантелями в вашем зале",
+  machine:"Шаг плитки тренажёра (часто 5 кг)",
+  bodyweight:"Шаг дополнительного веса на поясе или в жилете"
+};
+const STEP_KEYS = {barbell:"step_barbell", dumbbell:"step_dumbbell", machine:"step_machine", bodyweight:"step_bodyweight"};
+const ROUNDING = {nearest:"К ближайшему доступному весу", down:"Вниз (консервативно)", up:"Вверх (агрессивно)"};
+const DEFAULT_SETTINGS = {
+  step_barbell:2.5, step_dumbbell:2.5, step_machine:5.0, step_bodyweight:2.5,
+  rounding:"nearest", rest_base:180, rest_iso:60, auto_rest:true
+};
+const REST_DECAY = 5, REST_MIN = 30;
+
+/* =====================================================================
+   2. ДАННЫЕ (формат полностью совместим с gym_data.json)
+   ===================================================================== */
+const LS_DATA = "gymTracker.data", LS_SESSION = "gymTracker.session";
+
+function emptyData(){ return {logs:[], custom_categories:{}, workouts:[], settings:{...DEFAULT_SETTINGS}}; }
+
+function normalizeData(raw){
+  const d = raw && typeof raw === "object" ? raw : {};
+  return {
+    logs: Array.isArray(d.logs) ? d.logs : [],
+    custom_categories: d.custom_categories && typeof d.custom_categories === "object" ? d.custom_categories : {},
+    workouts: Array.isArray(d.workouts) ? d.workouts : [],
+    settings: {...DEFAULT_SETTINGS, ...(d.settings || {})}
+  };
+}
+
+function loadData(){
+  try { return normalizeData(JSON.parse(localStorage.getItem(LS_DATA))); }
+  catch(e){ return emptyData(); }
+}
+function saveData(){
+  try { localStorage.setItem(LS_DATA, JSON.stringify(state.data)); } catch(e){}
+}
+function loadSession(){
+  try { const s = JSON.parse(localStorage.getItem(LS_SESSION)); return s && s.startedAt ? s : null; }
+  catch(e){ return null; }
+}
+function saveSession(){
+  try {
+    if (state.session) localStorage.setItem(LS_SESSION, JSON.stringify(state.session));
+    else localStorage.removeItem(LS_SESSION);
+  } catch(e){}
+}
+
+/* =====================================================================
+   3. АЛГОРИТМЫ ПРОГРЕССИИ И АНАЛИТИКИ
+   ===================================================================== */
+const norm = n => String(n||"").trim().toLowerCase();
+const round2 = v => Math.round(v*100)/100;
+
+function categoryKey(name, data){
+  if (CATALOG[name]) return CATALOG[name];
+  const custom = data.custom_categories || {};
+  if (custom[norm(name)]) return custom[norm(name)];
+  return DEFAULT_CATEGORY;
+}
+const exerciseInfo = (name,data) => CATS[categoryKey(name,data)];
+const equipmentOf = (name,data) => EQUIP_BY_CAT[categoryKey(name,data)] || "barbell";
+const settingsOf = data => ({...DEFAULT_SETTINGS, ...(data.settings||{})});
+
+function stepFor(name, data){
+  const s = settingsOf(data);
+  let step = parseFloat(s[STEP_KEYS[equipmentOf(name,data)]]);
+  if (!isFinite(step) || step <= 0) step = CATS[categoryKey(name,data)].step;
+  return round2(step);
+}
+
+function roundToStep(value, step, mode){
+  if (!(step > 0)) return round2(value);
+  let ratio = value/step;
+  if (mode === "down") ratio = Math.floor(ratio + 1e-9);
+  else if (mode === "up") ratio = Math.ceil(ratio - 1e-9);
+  else ratio = Math.round(ratio);
+  return round2(ratio*step);
+}
+
+function logsFor(data, name){
+  const key = norm(name);
+  return data.logs.filter(l => norm(l.ex) === key).sort((a,b) => String(a.date).localeCompare(String(b.date)));
+}
+
+function suggestNext(data, name){
+  const info = exerciseInfo(name, data), s = settingsOf(data);
+  const step = stepFor(name, data), mode = s.rounding || "nearest";
+  const logs = logsFor(data, name);
+  const repRange = info.repLow + "-" + info.repHigh;
+  const equipment = EQUIP_LABEL[equipmentOf(name, data)];
+
+  if (!logs.length){
+    return {weight:null, repsHint:repRange, step, equipment,
+      note:"Нет истории. Начните с комфортного веса на " + repRange + " повторений."};
+  }
+  const last = logs[logs.length-1], lastTwo = logs.slice(-2);
+  const deload = lastTwo.length === 2 && lastTwo.every(l => l.rpe >= 9.5 || l.r < info.repLow);
+  let weight, note;
+
+  if (deload){
+    weight = roundToStep(last.w*0.9, step, "down");
+    note = "Два подряд подхода на грани отказа — разгрузка ~10% с округлением по шагу " + step + " кг.";
+  } else if (last.r >= info.repHigh && last.rpe <= 8){
+    weight = roundToStep(last.w + step, step, mode);
+    if (weight <= last.w) weight = round2(last.w + step);
+    note = "Верх диапазона при комфортном RPE — вес +" + step + " кг (" + equipment + "), повторения снова от " + info.repLow + ".";
+  } else if (last.rpe >= 9.5 || last.r < info.repLow){
+    weight = last.w;
+    note = "Близко к отказу или мало повторений — вес пока держим.";
+  } else {
+    weight = last.w;
+    note = "В диапазоне " + repRange + " — держим вес, цель: больше повторений (следующий шаг веса +" + step + " кг).";
+  }
+  return {weight, repsHint:repRange, step, equipment, note};
+}
+
+function restSeconds(name, setNumber, data){
+  const s = settingsOf(data);
+  const kind = exerciseInfo(name, data).rest;
+  const base = kind === "base" ? parseInt(s.rest_base,10) : parseInt(s.rest_iso,10);
+  return Math.max(base - REST_DECAY*Math.max(setNumber-1,0), REST_MIN);
+}
+
+const e1rm = (w,r) => (w>0 && r>0) ? Math.round(w*(1 + r/30)*10)/10 : 0;
+
+function fmtDuration(sec){
+  sec = Math.max(0, Math.round(sec));
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+  if (h) return h + " ч " + m + " мин";
+  if (m) return m + " мин " + String(s).padStart(2,"0") + " с";
+  return s + " с";
+}
+const mmss = sec => Math.floor(sec/60) + ":" + String(Math.max(0,sec)%60).padStart(2,"0");
+
+function summarize(entries, startedAt, finishedAt){
+  if (!entries.length) return null;
+  const volume = entries.reduce((a,e) => a + e.w*e.r, 0);
+  const avgRpe = entries.reduce((a,e) => a + e.rpe, 0)/entries.length;
+  const byEx = {};
+  entries.forEach(e => {
+    const st = byEx[e.ex] || (byEx[e.ex] = {sets:0, volume:0, reps:0, rpe:0, best1rm:0});
+    st.sets++; st.volume += e.w*e.r; st.reps += e.r; st.rpe += e.rpe;
+    st.best1rm = Math.max(st.best1rm, e1rm(e.w, e.r));
+  });
+  Object.values(byEx).forEach(st => { st.avgRpe = st.rpe/st.sets; st.volume = Math.round(st.volume*10)/10; });
+  const best = entries.reduce((a,b) => e1rm(b.w,b.r) > e1rm(a.w,a.r) ? b : a);
+  let duration = null;
+  if (startedAt && finishedAt){
+    const d = (new Date(finishedAt) - new Date(startedAt))/1000;
+    if (isFinite(d) && d >= 0) duration = d;
+  }
+  return {sets:entries.length, exercises:Object.keys(byEx).length,
+    volume:Math.round(volume*10)/10, avgRpe:Math.round(avgRpe*10)/10, best, duration, byEx};
+}
+
+function weakPoints(data, days){
+  const cutoff = Date.now() - (days||30)*86400000, byEx = {};
+  data.logs.forEach(l => {
+    const t = new Date(l.date).getTime();
+    if (!isFinite(t) || t < cutoff) return;
+    (byEx[l.ex] || (byEx[l.ex] = [])).push(l.rpe);
+  });
+  return Object.entries(byEx)
+    .map(([ex, rpes]) => ({ex, avg: rpes.reduce((a,b)=>a+b,0)/rpes.length, sets: rpes.length}))
+    .sort((a,b) => b.avg - a.avg);
+}
+
+function nextProgram(byEx){
+  return Object.entries(byEx).map(([ex, st]) => {
+    const g = suggestNext(state.data, ex);
+    const info = exerciseInfo(ex, state.data);
+    const logs = logsFor(state.data, ex);
+    const last = logs.length ? logs[logs.length-1] : null;
+    const sets = Math.min(5, Math.max(3, st.sets || 3));
+    let reps, plan;
+    if (last && g.weight !== null && g.weight > last.w){
+      reps = info.repLow;
+      plan = "вес вырос — стартуем с низа диапазона";
+    } else if (last && g.weight !== null && g.weight < last.w){
+      reps = info.repHigh;
+      plan = "разгрузка — лёгкий вес, чистая техника";
+    } else if (last){
+      reps = Math.min(info.repHigh, Math.round(last.r) + 1);
+      plan = "тот же вес — цель +1 повторение";
+    } else {
+      reps = info.repLow;
+      plan = "первая тренировка — вес по ощущениям";
+    }
+    return {ex, weight:g.weight, sets, reps, plan, step:g.step,
+      rest:restSeconds(ex, 1, state.data),
+      volume: g.weight !== null ? g.weight*reps*sets : 0};
+  });
+}
+
+function programSection(byEx, subtitle){
+  const program = nextProgram(byEx);
+  if (!program.length) return "";
+  let html = '<section class="card"><h2>Программа на следующую тренировку</h2>'+
+    '<p class="hint">'+esc(subtitle)+'</p>'+
+    '<table><thead><tr><th>Упражнение</th><th class="num">Вес</th><th class="num">Подходы</th></tr></thead><tbody>';
+  program.forEach(p => {
+    html += '<tr><td>'+esc(p.ex)+'<br><span style="color:var(--muted);font-size:12px">отдых '+mmss(p.rest)+' · '+esc(p.plan)+'</span></td>'+
+      '<td class="num">'+(p.weight!==null ? p.weight+' кг' : '—')+'</td>'+
+      '<td class="num">'+p.sets+' × '+p.reps+'</td></tr>';
+  });
+  const totalSets = program.reduce((a,p) => a + p.sets, 0);
+  const totalVolume = Math.round(program.reduce((a,p) => a + p.volume, 0));
+  html += '</tbody></table>'+
+    '<p class="hint" style="margin-top:12px">План: '+totalSets+' подх. · плановый объём ≈ '+totalVolume+' кг</p>'+
+  '</section>';
+  return html;
+}
+
+function rpePill(avg){
+  if (avg > 7) return '<span class="pill red">Высокий RPE</span>';
+  if (avg >= 6) return '<span class="pill orange">Средний RPE</span>';
+  return '<span class="pill green">Комфортный</span>';
+}
+
+function weekStats(data){
+  const cutoff = Date.now() - 7*86400000;
+  const logs = data.logs.filter(l => new Date(l.date).getTime() >= cutoff);
+  const volume = logs.reduce((a,l) => a + l.w*l.r, 0);
+  const avg = logs.length ? logs.reduce((a,l) => a + l.rpe, 0)/logs.length : 0;
+  return {workouts:data.workouts.length, sets:logs.length,
+    volume:Math.round(volume), avgRpe:Math.round(avg*10)/10};
+}
+
+/* =====================================================================
+   4. СОСТОЯНИЕ ИНТЕРФЕЙСА
+   ===================================================================== */
+const state = {
+  tab: "workout",
+  data: loadData(),
+  session: loadSession(),
+  draft: {ex:"", cat:DEFAULT_CATEGORY, w:20, r:8, rpe:7},
+  rest: null,        // {total, remaining, ex, setNo, done}
+  report: null,      // итоги завершённой тренировки
+  progressEx: "",
+  toast: ""
+};
+const esc = str => String(str).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const TABS = [
+  {key:"workout",  label:"Тренировка", icon:'<path d="M4 8v8M20 8v8M7 6v12M17 6v12M7 12h10"/>'},
+  {key:"insights", label:"Аналитика", icon:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'},
+  {key:"progress", label:"Прогресс",  icon:'<path d="M3 17l5-6 4 3 5-7 4 4"/><path d="M3 21h18"/>'},
+  {key:"settings", label:"Настройки", icon:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6"/>'}
+];
+
+/* =====================================================================
+   5. ЭКРАНЫ
+   ===================================================================== */
+function exerciseOptions(selected){
+  const known = Object.keys(CATALOG);
+  const custom = Object.keys(state.data.custom_categories||{});
+  const fromLogs = [...new Set(state.data.logs.map(l => l.ex))];
+  const all = [...new Set([...fromLogs, ...known])].sort((a,b) => a.localeCompare(b,"ru"));
+  let html = '<option value="">— выберите упражнение —</option>';
+  all.forEach(name => {
+    html += '<option value="'+esc(name)+'"'+(name===selected?' selected':'')+'>'+esc(name)+'</option>';
+  });
+  html += '<option value="__custom__"'+(selected=="__custom__"?' selected':'')+'>➕ Своё упражнение…</option>';
+  return html;
+}
+
+function stepper(field, value, unit, step){
+  return '<div class="stepper">'+
+    '<button type="button" aria-label="Меньше" data-dec="'+field+'">−</button>'+
+    '<div class="val"><b>'+value+'</b><span>'+esc(unit)+'</span></div>'+
+    '<button type="button" aria-label="Больше" data-inc="'+field+'">+</button>'+
+  '</div>';
+}
+
+function viewWorkout(){
+  const d = state.data, s = state.session;
+  if (!s) return viewWorkoutIdle();
+
+  const sug = state.draft.ex ? suggestNext(d, state.draft.ex) : null;
+  const setNo = state.draft.ex ? s.entries.filter(e => norm(e.ex) === norm(state.draft.ex)).length + 1 : 1;
+  const sum = summarize(s.entries, s.startedAt, new Date().toISOString());
+  const elapsed = (Date.now() - new Date(s.startedAt).getTime())/1000;
+
+  let html = '<h1>Тренировка идёт</h1>'+
+    '<p class="sub"><span class="dot"></span> '+fmtDuration(elapsed)+' · подходов: '+s.entries.length+
+    (sum ? ' · объём '+sum.volume+' кг' : '')+'</p>';
+
+  if (state.rest) html += viewRest();
+
+  html += '<section class="card">'+
+    '<label class="field"><span>Упражнение</span>'+
+      '<select id="exSelect">'+exerciseOptions(state.draft.ex || "")+'</select></label>';
+  if (state.draft.ex === "__custom__" || state.draft.customName !== undefined){
+    html += '<label class="field"><span>Название упражнения</span>'+
+      '<input type="text" id="customName" placeholder="Например: Жим в хаммере" value="'+esc(state.draft.customName||"")+'"></label>'+
+      '<label class="field"><span>Тип упражнения (определяет шаг и отдых)</span><select id="catSelect">'+
+        Object.entries(CATS).map(([k,v]) => '<option value="'+k+'"'+(state.draft.cat===k?' selected':'')+'>'+esc(v.label)+'</option>').join('')+
+      '</select></label>';
+  }
+  if (sug){
+    html += '<div class="note">'+
+      (sug.weight !== null ? '<b>Прогноз: '+sug.weight+' кг</b> · ' : '')+
+      'цель '+sug.repsHint+' повт. · шаг '+sug.step+' кг ('+esc(sug.equipment)+')<br>'+esc(sug.note)+
+      '</div>';
+  }
+  html += '</section>';
+
+  const stepW = sug ? sug.step : 2.5;
+  html += '<section class="card">'+
+    '<div class="row between" style="margin-bottom:12px"><b>Подход '+setNo+'</b>'+
+      '<span class="top-meta">шаг веса '+stepW+' кг</span></div>'+
+    '<label class="field"><span>Вес</span>'+stepper("w", state.draft.w, "кг", stepW)+'</label>'+
+    '<label class="field"><span>Повторения</span>'+stepper("r", state.draft.r, "повторений", 1)+'</label>'+
+    '<label class="field"><span>RPE — насколько тяжело (1–10)</span>'+stepper("rpe", state.draft.rpe, "RPE", 0.5)+'</label>'+
+    '<button class="btn primary" id="addSet">Записать подход</button>'+
+  '</section>';
+
+  html += '<section class="card"><h2>Подходы сегодня</h2>';
+  if (!s.entries.length){
+    html += '<p class="hint">Пока пусто. Запишите первый подход — таймер отдыха запустится сам.</p>';
+  } else {
+    html += '<ul class="setlist">';
+    s.entries.forEach((e,i) => {
+      html += '<li><span class="idx">'+(i+1)+'</span><span class="name">'+esc(e.ex)+'</span>'+
+        '<span class="num">'+e.w+' кг × '+e.r+'</span>'+
+        '<span class="num" style="color:var(--muted)">RPE '+e.rpe+'</span>'+
+        '<button data-del="'+i+'" aria-label="Удалить подход">✕</button></li>';
+    });
+    html += '</ul>';
+  }
+  html += '</section>';
+
+  html += '<div class="btn-row"><button class="btn ghost" id="cancelWorkout">Отменить</button>'+
+    '<button class="btn primary" id="finishWorkout">Завершить</button></div>';
+  return html;
+}
+
+function viewWorkoutIdle(){
+  const st = weekStats(state.data);
+  const last = state.data.workouts[state.data.workouts.length-1];
+  let html = '<h1>Готовы тренироваться?</h1>'+
+    '<p class="sub">Запустите сессию, запишите подходы с весом и RPE — в конце будет аналитика и прогноз на следующий раз.</p>'+
+    '<button class="btn primary" id="startWorkout" style="margin-bottom:16px">Начать тренировку</button>'+
+    '<section class="tiles">'+
+      '<div class="tile"><b>'+st.workouts+'</b><span>всего тренировок</span></div>'+
+      '<div class="tile"><b>'+st.sets+'</b><span>подходов за 7 дней</span></div>'+
+      '<div class="tile"><b>'+st.volume+'</b><span>объём за 7 дней, кг</span></div>'+
+      '<div class="tile"><b>'+(st.avgRpe||"—")+'</b><span>средний RPE за 7 дней</span></div>'+
+    '</section>';
+  if (last && last.entries && last.entries.length){
+    const sum = summarize(last.entries, last.started_at, last.finished_at);
+    html += '<section class="card soft"><h2>Прошлая тренировка</h2>'+
+      '<p class="hint">'+new Date(last.finished_at||last.started_at).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})+
+      ' · '+sum.sets+' подх., '+sum.volume+' кг, ср. RPE '+sum.avgRpe+
+      (sum.duration!==null ? ' · '+fmtDuration(sum.duration) : '')+'</p></section>';
+  } else {
+    html += '<section class="card soft"><h2>Переносите историю с компьютера?</h2>'+
+      '<p class="hint">Откройте настройки и импортируйте файл gym_data.json из десктопного приложения — все логи и настройки переедут сразу.</p></section>';
+  }
+  return html;
+}
+
+function viewRest(){
+  const r = state.rest, R = 78, C = 2*Math.PI*R;
+  const frac = r.total ? Math.max(0, Math.min(1, r.remaining/r.total)) : 0;
+  const color = r.done ? "var(--green)" : r.remaining <= 10 ? "var(--red)" : r.remaining <= 30 ? "var(--orange)" : "var(--blue)";
+  return '<section class="card"><div class="ring-wrap">'+
+    '<div class="ring"><svg viewBox="0 0 180 180" width="180" height="180" aria-hidden="true">'+
+      '<circle cx="90" cy="90" r="'+R+'" stroke="var(--border)" stroke-width="11" fill="none"/>'+
+      '<circle class="prog" cx="90" cy="90" r="'+R+'" stroke="'+color+'" stroke-width="11" fill="none"'+
+        ' stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+((1-frac)*C).toFixed(1)+'"/>'+
+    '</svg><div class="time">'+(r.done ? "Готово" : mmss(r.remaining))+'</div></div>'+
+    '<p class="hint" style="text-align:center">'+esc(r.ex)+' · отдых после подхода '+r.setNo+'</p>'+
+    '<div class="btn-row" style="width:100%">'+
+      '<button class="btn ghost" id="restPlus">+30 с</button>'+
+      '<button class="btn ghost" id="restSkip">'+(r.done ? "Закрыть" : "Пропустить")+'</button>'+
+    '</div></div></section>';
+}
+
+function viewInsights(){
+  const d = state.data;
+  const stats = weakPoints(d, 30);
+  let html = '<h1>Аналитика</h1><p class="sub">Слабые места и прогнозы по вашей истории за 30 дней.</p>';
+
+  html += '<section class="card"><h2>Слабые места</h2>';
+  if (!stats.length){
+    html += '<p class="hint">Нет данных за последние 30 дней.</p>';
+  } else {
+    html += '<table><thead><tr><th>Упражнение</th><th class="num" style="text-align:right">Ср. RPE</th><th></th></tr></thead><tbody>';
+    stats.slice(0,8).forEach(s => {
+      html += '<tr><td>'+esc(s.ex)+'<br><span style="color:var(--muted);font-size:12px">'+s.sets+' подх.</span></td>'+
+        '<td class="num">'+s.avg.toFixed(1)+'</td><td class="pillcell">'+rpePill(s.avg)+'</td></tr>';
+    });
+    html += '</tbody></table>';
+    const worst = stats[0];
+    html += '<div class="note '+(worst.avg > 7 ? 'warn' : 'ok')+'" style="margin-top:12px">'+
+      (worst.avg > 7
+        ? '«'+esc(worst.ex)+'» стабильно идёт на высоком RPE — стоит ставить его раньше в тренировке или снизить вес на 5–10%.'
+        : 'Явных слабых мест нет — можно держать текущую прогрессию.')+'</div>';
+  }
+  html += '</section>';
+
+  const exercises = [...new Set(d.logs.map(l => l.ex))].sort((a,b)=>a.localeCompare(b,"ru"));
+  if (exercises.length){
+    html += '<section class="card"><h2>Прогноз на следующую тренировку</h2><ul class="setlist">';
+    exercises.slice(0,10).forEach(ex => {
+      const s = suggestNext(d, ex);
+      html += '<li><span class="name">'+esc(ex)+'<br><span style="color:var(--muted);font-size:12px">шаг '+s.step+' кг · '+esc(s.equipment)+'</span></span>'+
+        '<span class="num">'+(s.weight!==null ? s.weight+' кг' : '—')+'<br><span style="color:var(--muted);font-size:12px;font-weight:400">'+s.repsHint+' повт.</span></span></li>';
+    });
+    html += '</ul></section>';
+  }
+
+  const history = d.workouts.slice(-5).reverse();
+  if (history.length){
+    html += '<section class="card"><h2>Последние тренировки</h2><ul class="setlist">';
+    history.forEach(w => {
+      const sum = summarize(w.entries||[], w.started_at, w.finished_at);
+      if (!sum) return;
+      html += '<li><span class="name">'+new Date(w.finished_at||w.started_at).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})+
+        '<br><span style="color:var(--muted);font-size:12px">'+sum.exercises+' упр., '+sum.sets+' подх.</span></span>'+
+        '<span class="num">'+sum.volume+' кг<br><span style="color:var(--muted);font-size:12px;font-weight:400">RPE '+sum.avgRpe+'</span></span></li>';
+    });
+    html += '</ul></section>';
+  }
+  return html;
+}
+
+function viewProgress(){
+  const d = state.data;
+  const exercises = [...new Set(d.logs.map(l => l.ex))].sort((a,b)=>a.localeCompare(b,"ru"));
+  let html = '<h1>Прогресс</h1><p class="sub">Рабочий вес и оценка 1ПМ по датам.</p>';
+  if (!exercises.length) return html + '<section class="card"><p class="empty">Запишите первую тренировку — график появится автоматически.</p></section>';
+
+  if (!state.progressEx || !exercises.includes(state.progressEx)) state.progressEx = exercises[0];
+  const logs = logsFor(d, state.progressEx);
+  const weights = logs.map(l => l.w);
+  const best = logs.reduce((a,l) => Math.max(a, e1rm(l.w,l.r)), 0);
+
+  html += '<section class="card">'+
+    '<label class="field"><span>Упражнение</span><select id="progressSelect">'+
+      exercises.map(e => '<option'+(e===state.progressEx?' selected':'')+'>'+esc(e)+'</option>').join('')+
+    '</select></label>'+ chartSvg(logs) +
+    '<div class="tiles" style="margin-top:12px">'+
+      '<div class="tile"><b>'+Math.min(...weights)+'</b><span>мин. вес, кг</span></div>'+
+      '<div class="tile"><b>'+Math.max(...weights)+'</b><span>макс. вес, кг</span></div>'+
+      '<div class="tile"><b>'+logs.length+'</b><span>записей</span></div>'+
+      '<div class="tile"><b>'+best+'</b><span>лучший e1RM, кг</span></div>'+
+    '</div></section>';
+
+  const s = suggestNext(d, state.progressEx);
+  html += '<section class="card"><h2>Следующая тренировка</h2>'+
+    '<div class="note">'+(s.weight!==null ? '<b>'+s.weight+' кг</b> на '+s.repsHint+' повт. · шаг '+s.step+' кг<br>' : '')+esc(s.note)+'</div></section>';
+  return html;
+}
+
+function chartSvg(logs){
+  const W = 320, H = 190, L = 34, R = 8, T = 12, B = 26;
+  if (!logs.length) return '<p class="empty">Нет данных</p>';
+  const pts = logs.slice(-14);
+  const ws = pts.map(p => p.w);
+  let min = Math.min(...ws), max = Math.max(...ws);
+  if (min === max){ min -= 1; max += 1; }
+  const cw = W-L-R, ch = H-T-B;
+  const x = i => L + (pts.length > 1 ? cw*i/(pts.length-1) : cw/2);
+  const y = w => T + ch - ((w-min)/(max-min))*ch;
+  const line = pts.map((p,i) => (i?"L":"M")+x(i).toFixed(1)+" "+y(p.w).toFixed(1)).join(" ");
+  const area = line + " L"+x(pts.length-1).toFixed(1)+" "+(T+ch)+" L"+x(0).toFixed(1)+" "+(T+ch)+" Z";
+  let svg = '<svg class="chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="График рабочего веса">';
+  svg += '<line class="grid" x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+(T+ch)+'"/>';
+  svg += '<line class="grid" x1="'+L+'" y1="'+(T+ch)+'" x2="'+(W-R)+'" y2="'+(T+ch)+'"/>';
+  svg += '<path class="area" d="'+area+'"/><path class="line" d="'+line+'"/>';
+  pts.forEach((p,i) => { svg += '<circle class="pt" cx="'+x(i).toFixed(1)+'" cy="'+y(p.w).toFixed(1)+'" r="3"/>'; });
+  svg += '<text x="2" y="'+(T+6)+'">'+max+'</text><text x="2" y="'+(T+ch)+'">'+min+'</text>';
+  svg += '<text x="'+L+'" y="'+(H-6)+'">'+new Date(pts[0].date).toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit"})+'</text>';
+  if (pts.length > 1) svg += '<text x="'+(W-R)+'" y="'+(H-6)+'" text-anchor="end">'+new Date(pts[pts.length-1].date).toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit"})+'</text>';
+  return svg + '</svg>';
+}
+
+function viewSettings(){
+  const s = settingsOf(state.data);
+  let html = '<h1>Настройки</h1><p class="sub">Прогрессия пересчитывается под реальное оборудование вашего зала.</p>';
+
+  html += '<section class="card"><h2>Доступный шаг веса</h2>';
+  Object.keys(STEP_KEYS).forEach(eq => {
+    html += '<label class="field"><span>'+esc(EQUIP_LABEL[eq])+' — '+esc(EQUIP_HINT[eq])+'</span>'+
+      '<div class="stepper">'+
+        '<button type="button" data-stepdec="'+STEP_KEYS[eq]+'" aria-label="Меньше">−</button>'+
+        '<div class="val"><b>'+s[STEP_KEYS[eq]]+'</b><span>кг</span></div>'+
+        '<button type="button" data-stepinc="'+STEP_KEYS[eq]+'" aria-label="Больше">+</button>'+
+      '</div></label>';
+  });
+  html += '</section>';
+
+  html += '<section class="card"><h2>Округление и отдых</h2>'+
+    '<label class="field"><span>Как округлять прогноз веса</span><select id="roundSelect">'+
+      Object.entries(ROUNDING).map(([k,v]) => '<option value="'+k+'"'+(s.rounding===k?' selected':'')+'>'+esc(v)+'</option>').join('')+
+    '</select></label>'+
+    '<label class="field"><span>Отдых в базовых упражнениях, сек</span>'+
+      '<div class="stepper"><button type="button" data-restdec="rest_base">−</button>'+
+      '<div class="val"><b>'+s.rest_base+'</b><span>сек</span></div>'+
+      '<button type="button" data-restinc="rest_base">+</button></div></label>'+
+    '<label class="field"><span>Отдых в изоляции, сек</span>'+
+      '<div class="stepper"><button type="button" data-restdec="rest_iso">−</button>'+
+      '<div class="val"><b>'+s.rest_iso+'</b><span>сек</span></div>'+
+      '<button type="button" data-restinc="rest_iso">+</button></div></label>'+
+    '<label class="field"><span>Таймер отдыха автоматически после подхода</span>'+
+      '<select id="autoRest"><option value="1"'+(s.auto_rest?' selected':'')+'>Включён</option>'+
+      '<option value="0"'+(!s.auto_rest?' selected':'')+'>Выключен</option></select></label>'+
+  '</section>';
+
+  const exs = [...new Set(state.data.logs.map(l => l.ex))].slice(0,4);
+  if (exs.length){
+    html += '<section class="card soft"><h2>Предпросмотр прогрессии</h2><ul class="setlist">'+
+      exs.map(ex => { const g = suggestNext(state.data, ex);
+        return '<li><span class="name">'+esc(ex)+'</span><span class="num">'+(g.weight!==null?g.weight+' кг':'—')+' · шаг '+g.step+'</span></li>';
+      }).join('')+'</ul></section>';
+  }
+
+  html += '<section class="card"><h2>Данные</h2>'+
+    '<p class="hint" style="margin-bottom:12px">Формат совпадает с gym_data.json из десктопного приложения — историю можно переносить в любую сторону.</p>'+
+    '<div class="btn-row"><button class="btn ghost filebtn">Импорт<input type="file" id="importFile" accept=".json,application/json"></button>'+
+    '<button class="btn ghost" id="exportData">Экспорт</button></div>'+
+    '<button class="btn danger" id="resetSettings" style="margin-top:10px">Сбросить настройки</button>'+
+  '</section>';
+
+  return html;
+}
+
+function viewReport(){
+  const rep = state.report;
+  const sum = rep.summary;
+  let html = '<div class="inner"><h1>Итоги тренировки</h1>'+
+    '<p class="sub">'+new Date(rep.finishedAt).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})+
+    (sum.duration!==null ? ' · '+fmtDuration(sum.duration) : '')+'</p>'+
+    '<section class="tiles">'+
+      '<div class="tile"><b>'+sum.sets+'</b><span>подходов</span></div>'+
+      '<div class="tile"><b>'+sum.exercises+'</b><span>упражнений</span></div>'+
+      '<div class="tile"><b>'+sum.volume+'</b><span>объём, кг</span></div>'+
+      '<div class="tile"><b>'+sum.avgRpe+'</b><span>средний RPE</span></div>'+
+    '</section>'+
+    '<section class="card soft"><h2>Лучший подход</h2>'+
+    '<p class="hint">'+esc(sum.best.ex)+' — '+sum.best.w+' кг × '+sum.best.r+' (e1RM ≈ '+e1rm(sum.best.w,sum.best.r)+' кг)</p></section>';
+
+  html += '<section class="card"><h2>Прогноз на следующую тренировку</h2>';
+  Object.entries(sum.byEx).forEach(([ex, st], i) => {
+    const g = suggestNext(state.data, ex);
+    html += '<div style="padding:12px 0'+(i?';border-top:1px solid var(--border)':'')+'">'+
+      '<div class="row between"><b>'+esc(ex)+'</b><span class="num">'+(g.weight!==null ? g.weight+' кг' : '—')+'</span></div>'+
+      '<p class="hint" style="margin-top:4px">'+st.sets+' подх., '+st.volume+' кг, ср. RPE '+st.avgRpe.toFixed(1)+', e1RM ≈ '+st.best1rm+' кг · шаг '+g.step+' кг</p>'+
+      '<p class="hint">'+esc(g.note)+'</p></div>';
+  });
+  html += '</section>';
+
+  html += programSection(sum.byEx, "Те же упражнения, что и в завершённой тренировке — с пересчитанными весами и подходами.");
+
+  const verdict = sum.avgRpe >= 8.5
+    ? {cls:"warn", text:"Тренировка была тяжёлой — не добавляйте вес сразу во всех упражнениях."}
+    : sum.avgRpe <= 6.5
+      ? {cls:"ok", text:"Запас хороший — можно аккуратно прогрессировать в базовых упражнениях."}
+      : {cls:"", text:"Нагрузка сбалансирована — двойная прогрессия: сначала повторения, затем вес."};
+  html += '<div class="note '+verdict.cls+'">'+verdict.text+'</div>'+
+    '<button class="btn primary" id="closeReport" style="margin-top:16px">Готово</button></div>';
+  return html;
+}
+
+/* =====================================================================
+   6. РЕНДЕР И СОБЫТИЯ
+   ===================================================================== */
+function render(){
+  const app = document.getElementById("app");
+  const s = settingsOf(state.data);
+  const head = '<header class="top"><div class="top-row">'+
+    '<span class="brand">GYM<span>TRACKER</span></span>'+
+    '<span class="top-meta">шаг '+s.step_barbell+' / '+s.step_dumbbell+' / '+s.step_machine+' кг</span>'+
+    '</div></header>';
+  const body = state.tab === "workout" ? viewWorkout()
+    : state.tab === "insights" ? viewInsights()
+    : state.tab === "progress" ? viewProgress() : viewSettings();
+  app.innerHTML = head + body + (state.toast ? '<div class="note ok" style="margin-top:12px">'+esc(state.toast)+'</div>' : '');
+
+  document.getElementById("tabs").innerHTML = '<div class="inner">'+TABS.map(t =>
+    '<button data-tab="'+t.key+'" aria-current="'+(state.tab===t.key)+'">'+
+    '<svg viewBox="0 0 24 24">'+t.icon+'</svg>'+t.label+'</button>').join('')+'</div>';
+
+  document.getElementById("overlay").innerHTML = state.report ? '<div class="overlay">'+viewReport()+'</div>' : '';
+}
+
+function toast(msg){
+  state.toast = msg;
+  render();
+  setTimeout(() => { state.toast = ""; render(); }, 2600);
+}
+
+function currentExerciseName(){
+  if (state.draft.ex === "__custom__") return (state.draft.customName || "").trim();
+  return (state.draft.ex || "").trim();
+}
+
+function startWorkout(){
+  state.session = {startedAt: new Date().toISOString(), entries: []};
+  saveSession();
+  render();
+}
+
+function addSet(){
+  const name = currentExerciseName();
+  if (!name){ toast("Сначала выберите упражнение"); return; }
+  if (!CATALOG[name] && !state.data.custom_categories[norm(name)]){
+    state.data.custom_categories[norm(name)] = state.draft.cat;
+  }
+  const entry = {ex:name, w:round2(state.draft.w), r:Math.round(state.draft.r), rpe:round2(state.draft.rpe),
+    date:new Date().toISOString().slice(0,19)};
+  state.session.entries.push(entry);
+  saveSession(); saveData();
+
+  const setNo = state.session.entries.filter(e => norm(e.ex) === norm(name)).length;
+  if (settingsOf(state.data).auto_rest) startRest(name, setNo);
+  render();
+}
+
+function removeSet(i){
+  state.session.entries.splice(i,1);
+  saveSession();
+  render();
+}
+
+let restTimer = null;
+function startRest(name, setNo){
+  const total = restSeconds(name, setNo, state.data);
+  state.rest = {total, remaining: total, ex: name, setNo, done: false};
+  clearInterval(restTimer);
+  restTimer = setInterval(() => {
+    if (!state.rest) { clearInterval(restTimer); return; }
+    state.rest.remaining--;
+    if (state.rest.remaining <= 0){
+      state.rest.remaining = 0; state.rest.done = true;
+      clearInterval(restTimer);
+      if (navigator.vibrate) navigator.vibrate([200,100,200]);
+    }
+    render();
+  }, 1000);
+}
+
+function finishWorkout(){
+  const s = state.session;
+  if (!s) return;
+  if (!s.entries.length){
+    if (!confirm("Завершить тренировку без подходов?")) return;
+    state.session = null; saveSession(); state.rest = null; clearInterval(restTimer); render(); return;
+  }
+  const finishedAt = new Date().toISOString().slice(0,19);
+  state.data.logs.push(...s.entries);
+  state.data.workouts.push({started_at: s.startedAt.slice(0,19), finished_at: finishedAt, entries: s.entries});
+  saveData();
+  state.report = {finishedAt, summary: summarize(s.entries, s.startedAt, finishedAt)};
+  state.session = null; saveSession();
+  state.rest = null; clearInterval(restTimer);
+  render();
+}
+
+function updateSetting(key, value){
+  state.data.settings = {...settingsOf(state.data), [key]: value};
+  saveData();
+  render();
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(state.data, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "gym_data.json";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function importData(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const incoming = normalizeData(JSON.parse(reader.result));
+      const seen = new Set(state.data.logs.map(l => l.date+"|"+l.ex+"|"+l.w+"|"+l.r));
+      incoming.logs.forEach(l => { if (!seen.has(l.date+"|"+l.ex+"|"+l.w+"|"+l.r)) state.data.logs.push(l); });
+      state.data.custom_categories = {...incoming.custom_categories, ...state.data.custom_categories};
+      const wseen = new Set(state.data.workouts.map(w => w.started_at));
+      incoming.workouts.forEach(w => { if (!wseen.has(w.started_at)) state.data.workouts.push(w); });
+      state.data.settings = {...settingsOf(state.data), ...incoming.settings};
+      saveData();
+      toast("Импорт завершён: подходов в истории — " + state.data.logs.length);
+    } catch(e){ toast("Не удалось прочитать файл"); }
+  };
+  reader.readAsText(file);
+}
+
+/* единый обработчи�� кликов */
+document.addEventListener("click", ev => {
+  const t = ev.target.closest("button");
+  if (!t) return;
+
+  if (t.dataset.tab){ state.tab = t.dataset.tab; render(); return; }
+  if (t.id === "startWorkout") return startWorkout();
+  if (t.id === "addSet") return addSet();
+  if (t.id === "finishWorkout") return finishWorkout();
+  if (t.id === "cancelWorkout"){
+    if (confirm("Отменить тренировку? Записанные подходы не сохранятся.")){
+      state.session = null; saveSession(); state.rest = null; clearInterval(restTimer); render();
+    }
+    return;
+  }
+  if (t.dataset.del !== undefined) return removeSet(parseInt(t.dataset.del,10));
+  if (t.id === "restSkip"){ state.rest = null; clearInterval(restTimer); render(); return; }
+  if (t.id === "restPlus" && state.rest){
+    state.rest.total += 30; state.rest.remaining += 30; state.rest.done = false;
+    if (!restTimer) startRest(state.rest.ex, state.rest.setNo);
+    render(); return;
+  }
+  if (t.id === "closeReport"){ state.report = null; state.tab = "insights"; render(); return; }
+  if (t.id === "exportData") return exportData();
+  if (t.id === "resetSettings"){
+    state.data.settings = {...DEFAULT_SETTINGS}; saveData(); toast("Настройки сброшены"); return;
+  }
+
+  const d = t.dataset;
+  if (d.inc || d.dec){
+    const field = d.inc || d.dec, dir = d.inc ? 1 : -1;
+    const name = currentExerciseName();
+    if (field === "w"){
+      const step = name ? stepFor(name, state.data) : 2.5;
+      state.draft.w = Math.max(0, round2(state.draft.w + dir*step));
+    } else if (field === "r"){
+      state.draft.r = Math.max(0, state.draft.r + dir);
+    } else {
+      state.draft.rpe = Math.min(10, Math.max(1, round2(state.draft.rpe + dir*0.5)));
+    }
+    render(); return;
+  }
+  if (d.stepinc || d.stepdec){
+    const key = d.stepinc || d.stepdec, dir = d.stepinc ? 1 : -1;
+    const cur = parseFloat(settingsOf(state.data)[key]) || 1;
+    updateSetting(key, Math.min(25, Math.max(0.5, round2(cur + dir*0.5))));
+    return;
+  }
+  if (d.restinc || d.restdec){
+    const key = d.restinc || d.restdec, dir = d.restinc ? 1 : -1;
+    const cur = parseInt(settingsOf(state.data)[key],10) || 60;
+    updateSetting(key, Math.min(600, Math.max(30, cur + dir*15)));
+    return;
+  }
+});
+
+document.addEventListener("change", ev => {
+  const el = ev.target;
+  if (el.id === "exSelect"){
+    state.draft.ex = el.value;
+    if (el.value === "__custom__") state.draft.customName = state.draft.customName || "";
+    else delete state.draft.customName;
+    const name = currentExerciseName();
+    if (name){
+      const g = suggestNext(state.data, name);
+      if (g.weight !== null) state.draft.w = g.weight;
+      state.draft.r = exerciseInfo(name, state.data).repLow;
+    }
+    render(); return;
+  }
+  if (el.id === "customName"){ state.draft.customName = el.value; return; }
+  if (el.id === "catSelect"){ state.draft.cat = el.value; render(); return; }
+  if (el.id === "progressSelect"){ state.progressEx = el.value; render(); return; }
+  if (el.id === "roundSelect") return updateSetting("rounding", el.value);
+  if (el.id === "autoRest") return updateSetting("auto_rest", el.value === "1");
+  if (el.id === "importFile" && el.files && el.files[0]) return importData(el.files[0]);
+});
+
+document.addEventListener("input", ev => {
+  if (ev.target.id === "customName") state.draft.customName = ev.target.value;
+});
+
+/* демо-состояния для проверки верстки: ?qa=session|report|insights|progress|settings */
+(function qa(){
+  const params = new URLSearchParams(location.search);
+  const mode = params.get("qa");
+  if (!mode) return;
+  const day = i => new Date(Date.now() - i*86400000).toISOString().slice(0,19);
+  const logs = [];
+  [["Жим штанги лёжа",[70,72.5,75,77.5,80]],["Присед со штангой",[100,105,105,110]],["Жим гантелей лёжа",[28,30,30]]]
+    .forEach(([ex, ws]) => ws.forEach((w,i) => logs.push({ex, w, r: 8 + (i%3), rpe: 7 + (i%3)*0.5, date: day(20 - i*3)})));
+  state.data = normalizeData({logs, workouts:[{started_at:day(3), finished_at:day(3), entries:logs.slice(0,5)}]});
+  if (mode === "session" || mode === "report"){
+    state.session = {startedAt: new Date(Date.now()-2700000).toISOString(),
+      entries: [
+        {ex:"Жим штанги лёжа", w:80, r:8, rpe:7.5, date:day(0)},
+        {ex:"Жим штанги лёжа", w:80, r:7, rpe:8.5, date:day(0)},
+        {ex:"Тяга верхнего блока", w:60, r:11, rpe:7, date:day(0)}
+      ]};
+    state.draft = {ex:"Жим штанги лёжа", cat:DEFAULT_CATEGORY, w:80, r:8, rpe:8};
+    state.rest = {total:180, remaining:96, ex:"Жим штанги лёжа", setNo:2, done:false};
+  }
+  if (mode === "report"){
+    const finishedAt = new Date().toISOString().slice(0,19);
+    state.report = {finishedAt, summary: summarize(state.session.entries, state.session.startedAt, finishedAt)};
+    state.session = null; state.rest = null;
+  }
+  if (mode === "insights") state.tab = "insights";
+  if (mode === "progress") state.tab = "progress";
+  if (mode === "settings") state.tab = "settings";
+  if (mode === "empty") state.data = emptyData();
+})();
+
+/* если тренировка была начата раньше — продолжаем её после закрытия браузера */
+if (state.session) state.tab = "workout";
+render();
+setInterval(() => { if (state.session && !state.report) render(); }, 30000);
+</script>
+</body>
+</html>
