@@ -133,6 +133,25 @@ nav.tabs button[aria-current="true"]{color:var(--blue);background:var(--blue-sof
 .empty{color:var(--muted);font-size:14px;text-align:center;padding:24px 8px}
 .filebtn{position:relative;overflow:hidden}
 .filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.restbar{position:fixed;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom));z-index:40;display:flex;justify-content:center;padding:0 16px;pointer-events:none}
+.restbar .inner{pointer-events:auto;width:100%;max-width:480px;display:flex;align-items:center;gap:10px;
+  background:var(--canvas);border:1px solid var(--border);border-radius:14px;padding:10px 12px;box-shadow:0 6px 20px rgba(0,0,0,.14)}
+.restbar .lead{width:10px;height:10px;border-radius:50%;background:var(--blue);flex:none}
+.restbar.done .lead{background:var(--green)}
+.restbar .txt{flex:1;min-width:0}
+.restbar .txt b{display:block;font-size:19px;font-weight:750;line-height:1.15;font-variant-numeric:tabular-nums}
+.restbar .txt span{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.restbar button{min-height:44px;min-width:56px;padding:0 10px;border-radius:10px;border:1px solid var(--border);
+  background:var(--soft);color:var(--text);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.pill.blue{background:var(--blue-soft);color:var(--blue)}
+details.scale{margin-top:8px;border:1px solid var(--border);border-radius:10px;background:var(--soft);overflow:hidden}
+details.scale summary{cursor:pointer;padding:11px 12px;font-size:13px;font-weight:650;color:var(--muted);list-style:none}
+details.scale summary::-webkit-details-marker{display:none}
+details.scale .body{padding:0 12px 8px}
+table.rpe td{font-size:13px;padding:7px 0}
+table.rpe td:first-child{width:46px;font-weight:750;font-variant-numeric:tabular-nums}
+table.rpe td:nth-child(2){width:78px;color:var(--muted);white-space:nowrap}
+table.rpe tr.now td{color:var(--blue);font-weight:700}
 @media (prefers-reduced-motion: no-preference){
   .ring circle.prog{transition:stroke-dashoffset .4s linear}
 }
@@ -140,6 +159,7 @@ nav.tabs button[aria-current="true"]{color:var(--blue);background:var(--blue-sof
 </head>
 <body>
 <div id="app"></div>
+<div id="restbarHost"></div>
 <nav class="tabs" id="tabs"></nav>
 <div id="overlay"></div>
 
@@ -188,7 +208,7 @@ const CATALOG = {
   "Французский жим с гантелью":"isolation_dumbbell",
   "Разгибание рук на блоке (трицепс)":"isolation_cable_machine",
   "Сгибание рук на блоке (бицепс)":"isolation_cable_machine",
-  "Разведение в тренажёре (пек-дек)":"isolation_cable_machine",
+  "Разведение в тренажёре (пе��-дек)":"isolation_cable_machine",
   "Сгибание ног в тренажёре":"isolation_cable_machine",
   "Разгибание ног в тренажёре":"isolation_cable_machine",
   "Подъём на носки (икры)":"isolation_cable_machine",
@@ -213,14 +233,36 @@ const STEP_KEYS = {barbell:"step_barbell", dumbbell:"step_dumbbell", machine:"st
 const ROUNDING = {nearest:"К ближайшему доступному весу", down:"Вниз (консервативно)", up:"Вверх (агрессивно)"};
 const DEFAULT_SETTINGS = {
   step_barbell:2.5, step_dumbbell:2.5, step_machine:5.0, step_bodyweight:2.5,
-  rounding:"nearest", rest_base:180, rest_iso:60, auto_rest:true
+  rounding:"nearest", rest_base:180, rest_iso:60, auto_rest:true,
+  sound:true, volume:70, vibrate:true, countdown:true, notify:false, keep_awake:true
 };
 const REST_DECAY = 5, REST_MIN = 30;
+
+/* Шкала RPE / RIR (RIR = сколько повторений осталось в запасе).
+   Рабочая зона гипертрофии — RPE 7–8.5 (в запасе 2–3 повторения). */
+const RPE_SCALE = [
+  {rpe:5,   rir:"~5+",  feel:"Очень легко"},
+  {rpe:5.5, rir:"~4–5", feel:"Очень легко"},
+  {rpe:6,   rir:"~4",   feel:"Легко"},
+  {rpe:6.5, rir:"~3–4", feel:"Легко"},
+  {rpe:7,   rir:"~3",   feel:"Умеренно тяжело"},
+  {rpe:7.5, rir:"~2–3", feel:"Умеренно тяжело"},
+  {rpe:8,   rir:"~2",   feel:"Тяжело"},
+  {rpe:8.5, rir:"~1–2", feel:"Тяжело"},
+  {rpe:9,   rir:"~1",   feel:"Очень тяжело"},
+  {rpe:9.5, rir:"0–1",  feel:"Почти отказ"},
+  {rpe:10,  rir:"0",    feel:"Максимум, отказ"}
+];
+const RPE_WORK_LOW = 7, RPE_WORK_HIGH = 8.5;
+function rpeInfo(v){
+  const num = Number(v);
+  return RPE_SCALE.find(x => x.rpe === num) || (num < 5 ? {rpe:num, rir:"6+", feel:"Разминка"} : {rpe:num, rir:"—", feel:"—"});
+}
 
 /* =====================================================================
    2. ДАННЫЕ (формат полностью совместим с gym_data.json)
    ===================================================================== */
-const LS_DATA = "gymTracker.data", LS_SESSION = "gymTracker.session";
+const LS_DATA = "gymTracker.data", LS_SESSION = "gymTracker.session", LS_REST = "gymTracker.rest";
 
 function emptyData(){ return {logs:[], custom_categories:{}, workouts:[], settings:{...DEFAULT_SETTINGS}}; }
 
@@ -301,22 +343,27 @@ function suggestNext(data, name){
       note:"Нет истории. Начните с комфортного веса на " + repRange + " повторений."};
   }
   const last = logs[logs.length-1], lastTwo = logs.slice(-2);
-  const deload = lastTwo.length === 2 && lastTwo.every(l => l.rpe >= 9.5 || l.r < info.repLow);
+  const deload = lastTwo.length === 2 && lastTwo.every(l => l.rpe >= 9.5 || (l.rpe >= 9 && l.r < info.repLow));
+  const rir = rpeInfo(last.rpe).rir;
   let weight, note;
 
   if (deload){
     weight = roundToStep(last.w*0.9, step, "down");
-    note = "Два подряд подхода на грани отказа — разгрузка ~10% с округлением по шагу " + step + " кг.";
-  } else if (last.r >= info.repHigh && last.rpe <= 8){
+    note = "Две сессии подряд на RPE 9.5–10 (в запасе 0–1 повторение) — разгрузка ~10%, чтобы вернуться в рабочую зону RPE " + RPE_WORK_LOW + "–" + RPE_WORK_HIGH + ".";
+  } else if (last.r >= info.repHigh && last.rpe <= 6.5){
+    weight = roundToStep(last.w + 2*step, step, mode);
+    if (weight <= last.w) weight = round2(last.w + 2*step);
+    note = "Верх диапазона и RPE " + last.rpe + " (в запасе " + rir + " повт.) — слишком легко, можно сразу +" + round2(2*step) + " кг (" + equipment + ").";
+  } else if (last.r >= info.repHigh && last.rpe <= RPE_WORK_HIGH){
     weight = roundToStep(last.w + step, step, mode);
     if (weight <= last.w) weight = round2(last.w + step);
-    note = "Верх диапазона при комфортном RPE — вес +" + step + " кг (" + equipment + "), повторения снова от " + info.repLow + ".";
-  } else if (last.rpe >= 9.5 || last.r < info.repLow){
+    note = "Верх диапазона при RPE " + last.rpe + " (в запасе " + rir + " повт.) — вес +" + step + " кг (" + equipment + "), повторения снова от " + info.repLow + ".";
+  } else if (last.rpe >= 9 || last.r < info.repLow){
     weight = last.w;
-    note = "Близко к отказу или мало повторений — вес пока держим.";
+    note = "Прошлый подход шёл на RPE " + last.rpe + " (в запасе " + rir + " повт.) — вес держим, цель добрать повторения при RPE " + RPE_WORK_LOW + "–" + RPE_WORK_HIGH + ".";
   } else {
     weight = last.w;
-    note = "В диапазоне " + repRange + " — держим вес, цель: больше повторений (следующий шаг веса +" + step + " кг).";
+    note = "Повторения в диапазоне " + repRange + ", RPE " + last.rpe + " — это рабочая зона. Держим вес и добираем повторения (следующий шаг +" + step + " кг).";
   }
   return {weight, repsHint:repRange, step, equipment, note};
 }
@@ -419,9 +466,19 @@ function programSection(byEx, subtitle){
 }
 
 function rpePill(avg){
-  if (avg > 7) return '<span class="pill red">Высокий RPE</span>';
-  if (avg >= 6) return '<span class="pill orange">Средний RPE</span>';
-  return '<span class="pill green">Комфортный</span>';
+  if (avg >= 9.5) return '<span class="pill red">На отказ · RIR 0</span>';
+  if (avg >= 9)   return '<span class="pill orange">Очень тяжело · RIR ~1</span>';
+  if (avg >= RPE_WORK_LOW) return '<span class="pill green">Рабочая зона · RIR 2–3</span>';
+  return '<span class="pill blue">Есть запас · RIR 4+</span>';
+}
+
+function rpeScaleDetails(current){
+  let rows = RPE_SCALE.filter(x => x.rpe % 1 === 0).map(x =>
+    '<tr'+(Number(current) === x.rpe ? ' class="now"' : '')+'><td>'+x.rpe+'</td><td>RIR '+x.rir+'</td><td>'+x.feel+'</td></tr>').join('');
+  return '<details class="scale"><summary>Шкала RPE ↔ RIR (запас повторений)</summary><div class="body">'+
+    '<table class="rpe"><tbody>'+rows+'</tbody></table>'+
+    '<p class="hint" style="margin-top:8px">Рабочая зона для роста — RPE '+RPE_WORK_LOW+'–'+RPE_WORK_HIGH+' (в запасе 2–3 повторения). RPE 7 — это норма, а не перегруз; тревожный сигнал начинается с RPE 9.</p>'+
+    '</div></details>';
 }
 
 function weekStats(data){
@@ -518,7 +575,11 @@ function viewWorkout(){
       '<span class="top-meta">шаг веса '+stepW+' кг</span></div>'+
     '<label class="field"><span>Вес</span>'+stepper("w", state.draft.w, "кг", stepW)+'</label>'+
     '<label class="field"><span>Повторения</span>'+stepper("r", state.draft.r, "повторений", 1)+'</label>'+
-    '<label class="field"><span>RPE — насколько тяжело (1–10)</span>'+stepper("rpe", state.draft.rpe, "RPE", 0.5)+'</label>'+
+    '<label class="field"><span>RPE — сколько повторений осталось в запасе</span>'+
+      stepper("rpe", state.draft.rpe, rpeInfo(state.draft.rpe).feel, 0.5)+
+      '<p class="hint" style="margin-top:6px">RPE '+state.draft.rpe+' · в запасе '+rpeInfo(state.draft.rpe).rir+' повт. · '+
+      (state.draft.rpe >= 9 ? 'почти отказ' : state.draft.rpe >= RPE_WORK_LOW ? 'рабочая зона' : 'есть запас')+'</p>'+
+      rpeScaleDetails(state.draft.rpe)+'</label>'+
     '<button class="btn primary" id="addSet">Записать подход</button>'+
   '</section>';
 
@@ -574,14 +635,27 @@ function viewRest(){
   return '<section class="card"><div class="ring-wrap">'+
     '<div class="ring"><svg viewBox="0 0 180 180" width="180" height="180" aria-hidden="true">'+
       '<circle cx="90" cy="90" r="'+R+'" stroke="var(--border)" stroke-width="11" fill="none"/>'+
-      '<circle class="prog" cx="90" cy="90" r="'+R+'" stroke="'+color+'" stroke-width="11" fill="none"'+
+      '<circle class="prog" id="restRing" cx="90" cy="90" r="'+R+'" stroke="'+color+'" stroke-width="11" fill="none"'+
         ' stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+((1-frac)*C).toFixed(1)+'"/>'+
-    '</svg><div class="time">'+(r.done ? "Готово" : mmss(r.remaining))+'</div></div>'+
-    '<p class="hint" style="text-align:center">'+esc(r.ex)+' · отдых после подхода '+r.setNo+'</p>'+
+    '</svg><div class="time" id="restTime">'+(r.done ? "Готово" : mmss(r.remaining))+'</div></div>'+
+    '<p class="hint" style="text-align:center">'+esc(r.ex)+' · отдых после подхода '+r.setNo+
+      (r.done ? ' · сигнал прозвучал' : '')+'</p>'+
     '<div class="btn-row" style="width:100%">'+
       '<button class="btn ghost" id="restPlus">+30 с</button>'+
       '<button class="btn ghost" id="restSkip">'+(r.done ? "Закрыть" : "Пропустить")+'</button>'+
     '</div></div></section>';
+}
+
+function viewRestBar(){
+  const r = state.rest;
+  if (!r) return "";
+  return '<div class="restbar'+(r.done ? ' done' : '')+'"><div class="inner">'+
+    '<span class="lead"></span>'+
+    '<span class="txt"><b id="restbarTime">'+(r.done ? "Готово" : mmss(r.remaining))+'</b>'+
+      '<span>'+esc(r.ex)+' · отдых после подхода '+r.setNo+'</span></span>'+
+    '<button id="restPlus">+30 с</button>'+
+    '<button id="restSkip">'+(r.done ? "✓" : "Стоп")+'</button>'+
+  '</div></div>';
 }
 
 function viewInsights(){
@@ -600,10 +674,10 @@ function viewInsights(){
     });
     html += '</tbody></table>';
     const worst = stats[0];
-    html += '<div class="note '+(worst.avg > 7 ? 'warn' : 'ok')+'" style="margin-top:12px">'+
-      (worst.avg > 7
-        ? '«'+esc(worst.ex)+'» стабильно идёт на высоком RPE — стоит ставить его раньше в тренировке или снизить вес на 5–10%.'
-        : 'Явных слабых мест нет — можно держать текущую прогрессию.')+'</div>';
+    html += '<div class="note '+(worst.avg >= 9 ? 'warn' : 'ok')+'" style="margin-top:12px">'+
+      (worst.avg >= 9
+        ? '«'+esc(worst.ex)+'» стабильно идёт на RPE '+worst.avg.toFixed(1)+' (в запасе 0–1 повторение) — стоит ставить его раньше в тренировке или снизить вес на 5–10%.'
+        : 'Все упражнения в рабочей зоне RPE '+RPE_WORK_LOW+'–'+RPE_WORK_HIGH+' — прогрессию можно держать.')+'</div>';
   }
   html += '</section>';
 
@@ -716,6 +790,25 @@ function viewSettings(){
       '<option value="0"'+(!s.auto_rest?' selected':'')+'>Выключен</option></select></label>'+
   '</section>';
 
+  const onOff = (id, val, on, off) => '<select id="'+id+'"><option value="1"'+(val?' selected':'')+'>'+on+'</option>'+
+    '<option value="0"'+(!val?' selected':'')+'>'+off+'</option></select>';
+  html += '<section class="card"><h2>Сигналы таймера</h2>'+
+    '<label class="field"><span>Звуковой сигнал в конце отдыха</span>'+onOff("soundSel", s.sound, "Включён", "Выключен")+'</label>'+
+    '<label class="field"><span>Громкость сигнала</span>'+
+      '<div class="stepper"><button type="button" data-voldec="volume" aria-label="Тише">−</button>'+
+      '<div class="val"><b>'+s.volume+'</b><span>%</span></div>'+
+      '<button type="button" data-volinc="volume" aria-label="Громче">+</button></div></label>'+
+    '<label class="field"><span>Отсчёт последних 3 секунд</span>'+onOff("countdownSel", s.countdown, "Включён", "Выключен")+'</label>'+
+    '<label class="field"><span>Вибрация телефона</span>'+onOff("vibrateSel", s.vibrate, "Включена", "Выключена")+'</label>'+
+    '<label class="field"><span>Не гасить экран во время отдыха</span>'+onOff("awakeSel", s.keep_awake, "Включено", "Выключено")+'</label>'+
+    '<label class="field"><span>Всплывающее уведомление с таймером</span>'+onOff("notifySel", s.notify, "Включено", "Выключено")+'</label>'+
+    '<div class="note">Статус уведомлений: '+notifyState()+'. Пока идёт отдых, таймер висит в шторке телефона и обновляется сам.</div>'+
+    '<div class="btn-row" style="margin-top:10px">'+
+      '<button class="btn ghost" id="askNotify">Разрешить уведомления</button>'+
+      '<button class="btn ghost" id="testSound">Проверить сигнал</button>'+
+    '</div>'+
+  '</section>';
+
   const exs = [...new Set(state.data.logs.map(l => l.ex))].slice(0,4);
   if (exs.length){
     html += '<section class="card soft"><h2>Предпросмотр прогрессии</h2><ul class="setlist">'+
@@ -747,7 +840,7 @@ function viewReport(){
       '<div class="tile"><b>'+sum.avgRpe+'</b><span>средний RPE</span></div>'+
     '</section>'+
     '<section class="card soft"><h2>Лучший подход</h2>'+
-    '<p class="hint">'+esc(sum.best.ex)+' — '+sum.best.w+' кг × '+sum.best.r+' (e1RM ≈ '+e1rm(sum.best.w,sum.best.r)+' кг)</p></section>';
+    '<p class="hint">'+esc(sum.best.ex)+' �� '+sum.best.w+' кг × '+sum.best.r+' (e1RM ≈ '+e1rm(sum.best.w,sum.best.r)+' кг)</p></section>';
 
   html += '<section class="card"><h2>Прогноз на следующую тренировку</h2>';
   Object.entries(sum.byEx).forEach(([ex, st], i) => {
@@ -761,11 +854,11 @@ function viewReport(){
 
   html += programSection(sum.byEx, "Те же упражнения, что и в завершённой тренировке — с пересчитанными весами и подходами.");
 
-  const verdict = sum.avgRpe >= 8.5
-    ? {cls:"warn", text:"Тренировка была тяжёлой — не добавляйте вес сразу во всех упражнениях."}
-    : sum.avgRpe <= 6.5
-      ? {cls:"ok", text:"Запас хороший — можно аккуратно прогрессировать в базовых упражнениях."}
-      : {cls:"", text:"Нагрузка сбалансирована — двойная прогрессия: сначала повторения, затем вес."};
+  const verdict = sum.avgRpe >= 9
+    ? {cls:"warn", text:"Средний RPE "+sum.avgRpe+" — почти все подходы шли в 0–1 повторении от отказа. Не добавляйте вес сразу во всех упражнениях."}
+    : sum.avgRpe < RPE_WORK_LOW
+      ? {cls:"ok", text:"Средний RPE "+sum.avgRpe+" — в запасе 4+ повторения. Можно смелее прибавлять вес в базовых упражнениях."}
+      : {cls:"", text:"Средний RPE "+sum.avgRpe+" — рабочая зона (в запасе 2–3 повт.). Двойная прогрессия: сначала повторения, затем вес."};
   html += '<div class="note '+verdict.cls+'">'+verdict.text+'</div>'+
     '<button class="btn primary" id="closeReport" style="margin-top:16px">Готово</button></div>';
   return html;
@@ -791,6 +884,9 @@ function render(){
     '<svg viewBox="0 0 24 24">'+t.icon+'</svg>'+t.label+'</button>').join('')+'</div>';
 
   document.getElementById("overlay").innerHTML = state.report ? '<div class="overlay">'+viewReport()+'</div>' : '';
+
+  document.getElementById("restbarHost").innerHTML =
+    (state.rest && (state.tab !== "workout" || state.report)) ? viewRestBar() : '';
 }
 
 function toast(msg){
@@ -832,21 +928,185 @@ function removeSet(i){
   render();
 }
 
+/* ---------- Звук, вибрация, системные уведомления ---------- */
+let audioCtx = null, swReg = null, restNotif = null, wakeLock = null;
+const NOTIF_ICON = (document.querySelector('link[rel="apple-touch-icon"]') || {}).href;
+
+function unlockAudio(){
+  try{
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  }catch(e){}
+}
+document.addEventListener("pointerdown", unlockAudio, {passive:true});
+
+function beep(freq, delay, dur, vol){
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime + delay;
+  const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
+  osc.type = "sine"; osc.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.linearRampToValueAtTime(vol, t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(g); g.connect(audioCtx.destination);
+  osc.start(t0); osc.stop(t0 + dur + 0.05);
+}
+function playSound(kind){
+  const s = settingsOf(state.data);
+  if (!s.sound) return;
+  unlockAudio();
+  const v = Math.max(0.02, Math.min(1, (parseInt(s.volume,10)||70)/100)) * 0.6;
+  if (kind === "tick") beep(880, 0, 0.08, v*0.45);
+  else { beep(784, 0, 0.18, v); beep(988, 0.22, 0.18, v); beep(1319, 0.44, 0.5, v); }
+}
+function vibrate(pattern){
+  if (settingsOf(state.data).vibrate && navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} }
+}
+
+function notifyOn(){
+  return settingsOf(state.data).notify && ("Notification" in window) && Notification.permission === "granted";
+}
+function notifyState(){
+  if (!("Notification" in window)) return "не поддерживаются браузером";
+  if (Notification.permission === "denied") return "запрещены в настройках браузера";
+  if (Notification.permission !== "granted") return "разрешение ещё не запрошено";
+  return settingsOf(state.data).notify ? "включены" : "разрешены, но выключены в приложении";
+}
+function askNotifyPermission(){
+  if (!("Notification" in window)){ toast("Браузер не поддерживает уведомления"); return; }
+  unlockAudio();
+  Promise.resolve(Notification.requestPermission()).then(res => {
+    updateSetting("notify", res === "granted");
+    toast(res === "granted" ? "Готово: таймер будет висеть уведомлением" : "Уведомления запрещены в браузере");
+  }).catch(() => toast("Не удалось запросить разрешение"));
+}
+function pushNotification(title, body, done){
+  if (!notifyOn()) return;
+  const opts = {body, tag:"gym-rest", renotify:true, silent:!done, icon:NOTIF_ICON, badge:NOTIF_ICON,
+    requireInteraction:!!done, vibrate: done ? [300,150,300] : undefined};
+  try{
+    if (swReg && swReg.showNotification){ swReg.showNotification(title, opts); return; }
+    closeRestNotification();
+    restNotif = new Notification(title, opts);
+    restNotif.onclick = () => { try{ window.focus(); }catch(e){} closeRestNotification(); };
+  }catch(e){}
+}
+function showRestNotification(done){
+  const r = state.rest;
+  if (!r) return;
+  pushNotification(
+    done ? "Отдых закончен — в подход!" : "Отдых " + mmss(r.remaining),
+    done ? r.ex + " · следующий подход №" + (r.setNo + 1)
+         : r.ex + " · после подхода " + r.setNo + " · всего " + mmss(r.total),
+    done);
+}
+function closeRestNotification(){
+  try{ if (restNotif){ restNotif.close(); restNotif = null; } }catch(e){}
+  try{
+    if (swReg && swReg.getNotifications)
+      swReg.getNotifications({tag:"gym-rest"}).then(list => list.forEach(n => n.close())).catch(() => {});
+  }catch(e){}
+}
+function requestWakeLock(){
+  if (!settingsOf(state.data).keep_awake || !navigator.wakeLock) return;
+  navigator.wakeLock.request("screen").then(l => { wakeLock = l; }).catch(() => {});
+}
+function releaseWakeLock(){ try{ if (wakeLock) wakeLock.release(); }catch(e){} wakeLock = null; }
+
+/* ---------- Таймер отдыха: считает по меткам времени, поэтому не отстаёт в фоне ---------- */
 let restTimer = null;
-function startRest(name, setNo){
-  const total = restSeconds(name, setNo, state.data);
-  state.rest = {total, remaining: total, ex: name, setNo, done: false};
+function saveRest(){
+  try{ state.rest ? localStorage.setItem(LS_REST, JSON.stringify(state.rest)) : localStorage.removeItem(LS_REST); }catch(e){}
+}
+function loadRest(){
+  try{
+    const r = JSON.parse(localStorage.getItem(LS_REST) || "null");
+    if (!r || !r.endsAt) return null;
+    if (Date.now() - r.endsAt > 15*60000) return null;
+    r.remaining = Math.max(0, Math.round((r.endsAt - Date.now())/1000));
+    r.done = r.remaining <= 0;
+    return r;
+  }catch(e){ return null; }
+}
+function startRest(name, setNo, seconds){
+  const total = seconds || restSeconds(name, setNo, state.data);
+  state.rest = {total, remaining: total, ex: name, setNo, done: false, endsAt: Date.now() + total*1000};
+  saveRest(); unlockAudio(); requestWakeLock(); showRestNotification(false);
+  runRestTimer(); syncOsTimer();
+}
+function runRestTimer(){
   clearInterval(restTimer);
-  restTimer = setInterval(() => {
-    if (!state.rest) { clearInterval(restTimer); return; }
-    state.rest.remaining--;
-    if (state.rest.remaining <= 0){
-      state.rest.remaining = 0; state.rest.done = true;
-      clearInterval(restTimer);
-      if (navigator.vibrate) navigator.vibrate([200,100,200]);
+  restTimer = setInterval(tickRest, 250);
+}
+function stopRest(){
+  state.rest = null;
+  clearInterval(restTimer); restTimer = null;
+  saveRest(); closeRestNotification(); releaseWakeLock(); syncOsTimer();
+}
+function addRestTime(sec){
+  const r = state.rest;
+  if (!r) return;
+  r.total += sec;
+  r.endsAt = Math.max(r.endsAt, Date.now()) + sec*1000;
+  r.done = false;
+  r.remaining = Math.max(0, Math.round((r.endsAt - Date.now())/1000));
+  saveRest(); requestWakeLock(); showRestNotification(false); runRestTimer(); render(); syncOsTimer();
+}
+function tickRest(){
+  const r = state.rest;
+  if (!r){ clearInterval(restTimer); restTimer = null; return; }
+  const rem = Math.max(0, Math.round((r.endsAt - Date.now())/1000));
+  if (rem === r.remaining && !(rem <= 0 && !r.done)) return;
+  const prev = r.remaining;
+  r.remaining = rem;
+  if (!r.done && rem <= 0){
+    r.done = true; saveRest();
+    clearInterval(restTimer); restTimer = null;
+    playSound("done"); vibrate([300,150,300,150,600]);
+    showRestNotification(true); releaseWakeLock();
+    render(); syncOsTimer();
+    return;
+  }
+  if (!r.done && settingsOf(state.data).countdown && rem > 0 && rem <= 3 && rem < prev){ playSound("tick"); vibrate(60); }
+  if (!r.done && (rem <= 5 || rem % 5 === 0)) showRestNotification(false);
+  paintRest(); syncOsTimer();
+}
+function restColor(r){
+  return r.done ? "var(--green)" : r.remaining <= 10 ? "var(--red)" : r.remaining <= 30 ? "var(--orange)" : "var(--blue)";
+}
+function paintRest(){
+  const r = state.rest;
+  if (!r) return;
+  const label = r.done ? "Готово" : mmss(r.remaining);
+  const ringTime = document.getElementById("restTime"), barTime = document.getElementById("restbarTime");
+  if (!ringTime && !barTime){ render(); return; }
+  if (ringTime) ringTime.textContent = label;
+  if (barTime) barTime.textContent = label;
+  const ring = document.getElementById("restRing");
+  if (ring){
+    const C = parseFloat(ring.getAttribute("stroke-dasharray")) || 1;
+    const frac = r.total ? Math.max(0, Math.min(1, r.remaining/r.total)) : 0;
+    ring.setAttribute("stroke-dashoffset", ((1-frac)*C).toFixed(1));
+    ring.setAttribute("stroke", restColor(r));
+  }
+}
+function syncOsTimer(){
+  const r = state.rest;
+  document.title = r ? (r.done ? "Готово — в подход!" : mmss(r.remaining) + " · отдых") : "Gym Tracker";
+  try{
+    if (navigator.setAppBadge){
+      if (r && !r.done) navigator.setAppBadge(Math.max(1, Math.ceil(r.remaining/60)));
+      else if (navigator.clearAppBadge) navigator.clearAppBadge();
     }
-    render();
-  }, 1000);
+  }catch(e){}
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible" || !state.rest) return;
+  if (!restTimer && !state.rest.done) runRestTimer();
+  requestWakeLock(); tickRest(); render();
+});
+if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
+  navigator.serviceWorker.register("sw.js").then(reg => { swReg = reg; }).catch(() => {});
 }
 
 function finishWorkout(){
@@ -854,7 +1114,7 @@ function finishWorkout(){
   if (!s) return;
   if (!s.entries.length){
     if (!confirm("Завершить тренировку без подходов?")) return;
-    state.session = null; saveSession(); state.rest = null; clearInterval(restTimer); render(); return;
+    state.session = null; saveSession(); stopRest(); render(); return;
   }
   const finishedAt = new Date().toISOString().slice(0,19);
   state.data.logs.push(...s.entries);
@@ -862,7 +1122,7 @@ function finishWorkout(){
   saveData();
   state.report = {finishedAt, summary: summarize(s.entries, s.startedAt, finishedAt)};
   state.session = null; saveSession();
-  state.rest = null; clearInterval(restTimer);
+  stopRest();
   render();
 }
 
@@ -910,16 +1170,18 @@ document.addEventListener("click", ev => {
   if (t.id === "finishWorkout") return finishWorkout();
   if (t.id === "cancelWorkout"){
     if (confirm("Отменить тренировку? Записанные подходы не сохранятся.")){
-      state.session = null; saveSession(); state.rest = null; clearInterval(restTimer); render();
+      state.session = null; saveSession(); stopRest(); render();
     }
     return;
   }
   if (t.dataset.del !== undefined) return removeSet(parseInt(t.dataset.del,10));
-  if (t.id === "restSkip"){ state.rest = null; clearInterval(restTimer); render(); return; }
-  if (t.id === "restPlus" && state.rest){
-    state.rest.total += 30; state.rest.remaining += 30; state.rest.done = false;
-    if (!restTimer) startRest(state.rest.ex, state.rest.setNo);
-    render(); return;
+  if (t.id === "restSkip"){ stopRest(); render(); return; }
+  if (t.id === "restPlus" && state.rest) return addRestTime(30);
+  if (t.id === "askNotify") return askNotifyPermission();
+  if (t.id === "testSound"){
+    unlockAudio(); playSound("done"); vibrate([300,150,300]);
+    pushNotification("Проверка уведомления", "Так будет выглядеть сигнал в конце отдыха", true);
+    toast("Сигнал воспроизведён"); return;
   }
   if (t.id === "closeReport"){ state.report = null; state.tab = "insights"; render(); return; }
   if (t.id === "exportData") return exportData();
@@ -946,6 +1208,11 @@ document.addEventListener("click", ev => {
     const cur = parseFloat(settingsOf(state.data)[key]) || 1;
     updateSetting(key, Math.min(25, Math.max(0.5, round2(cur + dir*0.5))));
     return;
+  }
+  if (d.volinc || d.voldec){
+    const cur = parseInt(settingsOf(state.data).volume,10) || 70;
+    updateSetting("volume", Math.min(100, Math.max(10, cur + (d.volinc ? 10 : -10))));
+    playSound("tick"); return;
   }
   if (d.restinc || d.restdec){
     const key = d.restinc || d.restdec, dir = d.restinc ? 1 : -1;
@@ -974,6 +1241,14 @@ document.addEventListener("change", ev => {
   if (el.id === "progressSelect"){ state.progressEx = el.value; render(); return; }
   if (el.id === "roundSelect") return updateSetting("rounding", el.value);
   if (el.id === "autoRest") return updateSetting("auto_rest", el.value === "1");
+  if (el.id === "soundSel") return updateSetting("sound", el.value === "1");
+  if (el.id === "countdownSel") return updateSetting("countdown", el.value === "1");
+  if (el.id === "vibrateSel") return updateSetting("vibrate", el.value === "1");
+  if (el.id === "awakeSel") return updateSetting("keep_awake", el.value === "1");
+  if (el.id === "notifySel"){
+    if (el.value === "1" && (!("Notification" in window) || Notification.permission !== "granted")) return askNotifyPermission();
+    return updateSetting("notify", el.value === "1");
+  }
   if (el.id === "importFile" && el.files && el.files[0]) return importData(el.files[0]);
 });
 
@@ -999,7 +1274,7 @@ document.addEventListener("input", ev => {
         {ex:"Тяга верхнего блока", w:60, r:11, rpe:7, date:day(0)}
       ]};
     state.draft = {ex:"Жим штанги лёжа", cat:DEFAULT_CATEGORY, w:80, r:8, rpe:8};
-    state.rest = {total:180, remaining:96, ex:"Жим штанги лёжа", setNo:2, done:false};
+    state.rest = {total:180, remaining:96, ex:"Жим штанги лёжа", setNo:2, done:false, endsAt: Date.now() + 96000};
   }
   if (mode === "report"){
     const finishedAt = new Date().toISOString().slice(0,19);
@@ -1014,8 +1289,25 @@ document.addEventListener("input", ev => {
 
 /* если тренировка была начата раньше — продолжаем её после закрытия браузера */
 if (state.session) state.tab = "workout";
+if (!state.rest && state.session){
+  const restored = loadRest();
+  if (restored){
+    state.rest = restored;
+    if (!restored.done) runRestTimer();
+  }
+}
 render();
+syncOsTimer();
 setInterval(() => { if (state.session && !state.report) render(); }, 30000);
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js")
+        .then(() => console.log("Service Worker registered"))
+        .catch(err => console.error("Service Worker registration failed:", err));
+    });
+  }
 </script>
 </body>
 </html>
