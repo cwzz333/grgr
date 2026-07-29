@@ -1,12 +1,21 @@
 {
   "name": "Gym Tracker",
   "short_name": "GymTracker",
-  "start_url": "./index.html",
+  "description": "Minimalist gym workout tracker with automatic progression, rest timer and training analytics.",
+  "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2783de",
+  "background_color": "#191919",
+  "theme_color": "#191919",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
