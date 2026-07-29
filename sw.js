@@ -1,7 +1,7 @@
 /* Service worker для Gym Tracker.
    Нужен, чтобы таймер отдыха показывался всплывающим уведомлением на Android
    (там new Notification() не работает) и чтобы приложение открывалось оффлайн. */
-const CACHE = "gym-tracker-v1";
+const CACHE = "gym-tracker-v2";
 const ASSETS = ["./", "./index.html", "./manifest.json"];
 
 self.addEventListener("install", event => {
