@@ -1,0 +1,11 @@
+{
+  "key.godbox.toggle": "God mode (WorldBox)",
+  "category.godbox": "GodBox",
+  "key.godbox.minimap": "Minimap",
+  "key.godbox.worldmap": "World map",
+  "key.godbox.codex": "Powers codex",
+  "key.godbox.stats": "World stats",
+  "key.godbox.help": "Help",
+  "key.godbox.eras": "World era picker",
+  "item.godbox.model": "Model part"
+}
