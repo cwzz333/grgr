@@ -920,16 +920,25 @@ public final class Civ {
         tell(w, Text.literal(k.title + ": заложено — " + want.title + (cleared > 10 ? " (сначала расчищают площадку)" : "")).formatted(k.color));
     }
 
+    /** Шаг сетки кварталов; улицы (2 блока) лежат на смещениях 5..6 от центра квартала. */
+    static final int GRID = 11;
+
     static Building site(Kingdoms.K k, City c, Kind kind, ServerWorld w) {
         Random r = w.getRandom();
         int base = kind == Kind.QUARRY ? 14 : 9;
         int spread = Math.min(150, 6 + c.buildings.size() * 2);
-        for (int i = 0; i < 70; i++) {
+        boolean grid = kind != Kind.QUARRY && kind.w <= 7 && kind.d <= 7;
+        for (int i = 0; i < 90; i++) {
             BlockPos cap0 = Conquest.center(k, r);
             double a = r.nextDouble() * Math.PI * 2;
             double dist = base + r.nextDouble() * Math.min(spread, 14 + i * 2) + i * 0.3;
             int cx = cap0.getX() + (int) Math.round(Math.cos(a) * dist);
             int cz = cap0.getZ() + (int) Math.round(Math.sin(a) * dist);
+            if (grid) {
+                // кварталы по сетке улиц вокруг столицы: центры участков кратны GRID, улицы между ними
+                cx = k.capital.getX() + Math.round((float) (cx - k.capital.getX()) / GRID) * GRID;
+                cz = k.capital.getZ() + Math.round((float) (cz - k.capital.getZ()) / GRID) * GRID;
+            }
             int x0 = cx - kind.w / 2, z0 = cz - kind.d / 2, x1 = x0 + kind.w - 1, z1 = z0 + kind.d - 1;
             if (x1 >= k.capital.getX() - 6 && x0 <= k.capital.getX() + 6 && z1 >= k.capital.getZ() - 6 && z0 <= k.capital.getZ() + 6) continue;
             boolean bad = false;

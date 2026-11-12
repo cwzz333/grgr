@@ -1089,6 +1089,30 @@
     "custom_model_data": 3039
    },
    "model": "godbox:item/m/hats/bandit_hood_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 4000
+   },
+   "model": "godbox:item/m/guns/musket"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 4001
+   },
+   "model": "godbox:item/m/guns/ball"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 4100
+   },
+   "model": "godbox:item/m/cannon/carriage"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 4101
+   },
+   "model": "godbox:item/m/cannon/barrel"
   }
  ]
 }

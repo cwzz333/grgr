@@ -136,6 +136,7 @@ def build_creature(c):
     index = {p.name: i for i, p in enumerate(c.parts)}
     rig = {"name": c.name, "id_base": c.id_base, "scale": c.scale, "res": c.res, "hide_carrier": c.hide_carrier,
            "death_fx": c.death_fx, "hitbox": c.hitbox, "texture": tex, "ghosts": c.ghosts,
+           "item_overrides": [[item, index[p.name]] for item, p in c.overrides],
            "parts": [{"name": p.name, "cmd": c.id_base + i, "model": "%s:item/m/%s/%s" % (NS, c.name, p.name),
                       "parent": index[p.parent.name] if p.parent is not None else -1,
                       "pivot": list(p.pivot), "rot": list(p.rot), "scale": p.scale, "bright": p.bright,
@@ -212,6 +213,33 @@ def java_table(rigs):
 
 def jname(name):
     return "c_" + "".join(ch if ch.isalnum() else "_" for ch in name)
+
+
+# ---------------------------------------------------------------- vanilla item overrides
+
+def write_item_overrides(assets, rigs):
+    """Vanilla items that turn into one of our parts by custom_model_data (Creature.item_override).
+
+    Minecraft takes the LAST matching override, so ours go after the vanilla ones (pulling/charged of the
+    crossbow) and win whatever the item's state is.
+    """
+    by_item = {}
+    for r in rigs:
+        for item, pi in r.get("item_overrides", ()):
+            by_item.setdefault(item, []).append(r["parts"][pi])
+    for item, parts in by_item.items():
+        ns, name = item.split(":", 1)
+        src = os.path.join(HERE, "vanilla", name + ".json")
+        if not os.path.isfile(src):
+            raise SystemExit("item_override: put the vanilla model of %s into %s" % (item, os.path.relpath(src)))
+        model = json.load(open(src))
+        model.setdefault("overrides", [])
+        for p in sorted(parts, key=lambda p: p["cmd"]):
+            model["overrides"].append({"predicate": {"custom_model_data": p["cmd"]}, "model": p["model"]})
+        d = os.path.join(assets, "..", ns, "models", "item")
+        os.makedirs(d, exist_ok=True)
+        with open(os.path.join(d, name + ".json"), "w") as f:
+            json.dump(model, f, indent=1)
 
 
 # ---------------------------------------------------------------- validation
@@ -344,6 +372,7 @@ def main():
                    "overrides": overrides}, f, indent=1)
     with open(java, "w") as f:
         f.write(java_table(rigs))
+    write_item_overrides(assets, rigs)
 
     errs = validate(assets, rigs)
     for e in errs:

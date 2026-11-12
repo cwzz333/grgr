@@ -26,6 +26,7 @@ public class GodBox implements ModInitializer {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> GodManager.onDisconnect(handler.player));
         Config.load();
         Models.init();
+        Guns.init();
         ServerLifecycleEvents.SERVER_STARTED.register(Save::load);
         ServerLifecycleEvents.SERVER_STARTED.register(server -> Config.flush());
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {

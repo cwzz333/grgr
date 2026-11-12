@@ -404,7 +404,14 @@ class Creature:
         self.hide_carrier, self.death_fx, self.hitbox = bool(hide_carrier), bool(death_fx), hitbox
         self.parts = []
         self.ghosts = []
+        self.overrides = []
         REGISTRY.append(self)
+
+    def item_override(self, item, part):
+        """Show `part` instead of the vanilla `item` (e.g. "minecraft:crossbow") when the stack carries the part's
+        custom_model_data. gen.py appends the override to a copy of the vanilla model (tools/models/vanilla/)."""
+        self.overrides.append((item, part))
+        return self
 
     def ghost(self, frm, to, color):
         """Preview-only flat box in creature space (px), e.g. the mob's head under a hat. Not exported to the game."""

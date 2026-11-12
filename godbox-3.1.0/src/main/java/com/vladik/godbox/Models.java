@@ -164,6 +164,19 @@ public final class Models {
         return true;
     }
 
+    /** Предмет-деталь по имени набора и детали (для снарядов и оружия) или null. */
+    public static ItemStack part(String creature, String name) {
+        ModelParts.Creature def = ModelParts.get(creature);
+        if (def == null || item == null || !custom()) return null;
+        for (ModelParts.Part p : def.parts()) {
+            if (!p.name().equals(name)) continue;
+            ItemStack stack = new ItemStack(item);
+            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(p.cmd()));
+            return stack;
+        }
+        return null;
+    }
+
     public static boolean isHat(ItemStack stack) {
         return item != null && stack.isOf(item);
     }

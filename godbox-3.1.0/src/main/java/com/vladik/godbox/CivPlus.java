@@ -508,27 +508,47 @@ final class CivPlus {
     }
 
     // ---------------- дороги и фонари ----------------
+    /** Смещение начала 2-блочной улицы (≡5 по модулю шага сетки), ближайшее от a в сторону dir. */
+    private static int street(int a, int dir) {
+        int m = Math.floorMod(a - 5, Civ.GRID);
+        if (m == 0) return a;
+        return dir > 0 ? a + (Civ.GRID - m) : a - m;
+    }
+
     static void road(Kingdoms.K k, Civ.Building b, ServerWorld w, Civ.Project p) {
         if (b.kind == Civ.Kind.QUARRY) return;
         BlockPos s = Civ.front(k, b, w);
-        int x = s.getX(), z = s.getZ(), tx = k.capital.getX(), tz = k.capital.getZ();
-        int dx = Math.abs(tx - x), dz = Math.abs(tz - z), sx = x < tx ? 1 : -1, sz = z < tz ? 1 : -1, err = dx - dz;
-        boolean alongX = dx >= dz;
-        for (int step = 0; step < 70; step++) {
-            if (Math.abs(x - tx) <= 5 && Math.abs(z - tz) <= 5) break;
+        int tx = k.capital.getX(), tz = k.capital.getZ();
+        int[] pos = {s.getX(), s.getZ()};
+        int[] budget = {170};
+        boolean doorX = Math.abs(tx - b.cx()) >= Math.abs(tz - b.cz());
+        if (doorX) {
+            // от двери на ближайшую улицу-столбец, по ней к улице у площади, затем к площади
+            leg(w, p, pos, tx + street(pos[0] - tx, tx > pos[0] ? 1 : -1), pos[1], tx, tz, budget);
+            leg(w, p, pos, pos[0], pos[1] >= tz ? tz + 5 : tz - 6, tx, tz, budget);
+            leg(w, p, pos, tx, pos[1], tx, tz, budget);
+        } else {
+            leg(w, p, pos, pos[0], tz + street(pos[1] - tz, tz > pos[1] ? 1 : -1), tx, tz, budget);
+            leg(w, p, pos, pos[0] >= tx ? tx + 5 : tx - 6, pos[1], tx, tz, budget);
+            leg(w, p, pos, pos[0], tz, tx, tz, budget);
+        }
+    }
+
+    /** Прямой отрезок дороги шириной 2 из pos в (ex,ez); останавливается у площади столицы. */
+    private static void leg(ServerWorld w, Civ.Project p, int[] pos, int ex, int ez, int tx, int tz, int[] budget) {
+        boolean alongX = pos[0] != ex;
+        while ((pos[0] != ex || pos[1] != ez) && budget[0]-- > 0) {
+            int x = pos[0], z = pos[1];
+            if (Math.abs(x - tx) <= 5 && Math.abs(z - tz) <= 5) {
+                budget[0] = 0;
+                return;
+            }
             if (!Civ.inCity(x, z, 0)) pave(w, p, x, z);
             int ox = alongX ? x : x + 1, oz = alongX ? z + 1 : z;
             if (!Civ.inCity(ox, oz, 0)) pave(w, p, ox, oz);
-            if (step % 9 == 4) lamp(w, p, alongX ? x : x - 1, alongX ? z - 1 : z);
-            int e2 = 2 * err;
-            if (e2 > -dz) {
-                err -= dz;
-                x += sx;
-            }
-            if (e2 < dx) {
-                err += dx;
-                z += sz;
-            }
+            if (budget[0] % 9 == 4) lamp(w, p, alongX ? x : x - 1, alongX ? z - 1 : z);
+            if (alongX) pos[0] += Integer.signum(ex - x);
+            else pos[1] += Integer.signum(ez - z);
         }
     }
 

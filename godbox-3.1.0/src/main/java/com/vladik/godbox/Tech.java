@@ -255,17 +255,24 @@ public final class Tech {
     /** Порох: вместо катапульты стреляет пушка — быстрое ядро и сильный взрыв. */
     static boolean cannon(ServerWorld w, Kingdoms.K k, MobEntity m, BlockPos target) {
         if (!has(k, T.GUNPOWDER)) return false;
-        double dx = target.getX() + 0.5 - m.getX(), dz = target.getZ() + 0.5 - m.getZ(), dy = target.getY() - (m.getEyeY() + 1);
+        if (Guns.cannon(w, k, m, target)) return true;
+        cannonball(w, m, m.getX(), m.getEyeY() + 1, m.getZ(), target, new ItemStack(Items.FIRE_CHARGE));
+        return true;
+    }
+
+    /** Ядро из точки (ox, oy, oz) по навесной траектории в target; item — вид летящего снаряда. */
+    static void cannonball(ServerWorld w, MobEntity m, double ox, double oy, double oz, BlockPos target, ItemStack item) {
+        double dx = target.getX() + 0.5 - ox, dz = target.getZ() + 0.5 - oz, dy = target.getY() - oy;
         double d = Math.sqrt(dx * dx + dz * dz);
         double n = Math.max(12, d / 2.0);
         SnowballEntity sb = new SnowballEntity(w, m);
-        sb.setItem(new ItemStack(Items.FIRE_CHARGE));
-        sb.setPosition(m.getX(), m.getEyeY() + 1, m.getZ());
+        sb.setItem(item);
+        sb.setPosition(ox, oy, oz);
         sb.setVelocity(dx / n * (1 + 0.0055 * n), (dy + 0.5 * 0.03 * n * n) / n * (1 + 0.004 * n), dz / n * (1 + 0.0055 * n));
         w.spawnEntity(sb);
-        Fx.sound(w, m.getX(), m.getY(), m.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE.value(), 4f, 1.4f);
-        Fx.particles(w, ParticleTypes.EXPLOSION, m.getX(), m.getEyeY() + 1, m.getZ(), 1, 0, 0, 0, 0);
-        Fx.particles(w, ParticleTypes.LARGE_SMOKE, m.getX(), m.getEyeY() + 1, m.getZ(), 14, 0.4, 0.4, 0.4, 0.04);
+        Fx.sound(w, ox, oy, oz, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), 4f, 1.4f);
+        Fx.particles(w, ParticleTypes.EXPLOSION, ox, oy, oz, 1, 0, 0, 0, 0);
+        Fx.particles(w, ParticleTypes.LARGE_SMOKE, ox, oy, oz, 14, 0.4, 0.4, 0.4, 0.04);
         float power = (float) Config.d("tech.cannon.power", 3.5);
         Vec3d[] last = {sb.getPos()};
         int[] age = {0};
@@ -281,7 +288,6 @@ public final class Tech {
             Fx.particles(w, ParticleTypes.LARGE_SMOKE, last[0].x, last[0].y + 1, last[0].z, 20, 1, 1, 1, 0.05);
             return true;
         });
-        return true;
     }
 
     /** Порох на флоте: 1 — корабельные орудия бьют дальше и сильнее. */
@@ -298,8 +304,15 @@ public final class Tech {
             LivingEntity e = m.getTarget();
             if (e == null || !e.isAlive() || e.getWorld() != w) continue;
             double d2 = m.squaredDistanceTo(e);
+            // с моделями оружия залп дают только те, у кого в руках мушкет
+            boolean musket = Guns.isMusket(m.getMainHandStack());
+            if (!musket && Models.custom() && ModelParts.has("guns")) continue;
             if (d2 < 16 || d2 > 20 * 20 || r.nextInt(roll) != 0 || !m.canSee(e)) continue;
             left--;
+            if (musket) {
+                Guns.fire(w, m, e, Vec3d.ZERO);
+                continue;
+            }
             Vec3d a = new Vec3d(m.getX(), m.getEyeY(), m.getZ()), v = new Vec3d(e.getX(), e.getBodyY(0.6), e.getZ()).subtract(a);
             for (int i = 1; i <= 5; i++) Fx.particles(w, ParticleTypes.SMOKE, a.x + v.x * i / 6, a.y + v.y * i / 6, a.z + v.z * i / 6, 1, 0, 0, 0, 0);
             Fx.particles(w, ParticleTypes.FLAME, a.x, a.y, a.z, 4, 0.1, 0.1, 0.1, 0.02);

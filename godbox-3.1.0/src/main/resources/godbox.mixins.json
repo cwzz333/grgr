@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "com.vladik.godbox.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["WorldMixin", "DisplayEntityAccessor"],
+  "mixins": ["WorldMixin", "DisplayEntityAccessor", "VillagerMixin"],
   "injectors": {
     "defaultRequire": 1
   }

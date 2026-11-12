@@ -251,7 +251,8 @@ public final class Kingdoms {
         Civ.found(k);
         for (int i = 0; i < 5; i++) spawn(k, EntityType.VILLAGER, around(w, base, 2));
         for (int i = 0; i < 6; i++) spawn(k, soldier(r), around(w, base, 3));
-        spawn(k, EntityType.IRON_GOLEM, around(w, base, 2));
+        // голем-защитник при основании — только если големы жителей разрешены в настройках
+        if (Config.b("villagers.golems", false)) spawn(k, EntityType.IRON_GOLEM, around(w, base, 2));
         Fx.sound(w, base.getX(), base.getY(), base.getZ(), net.minecraft.sound.SoundEvents.EVENT_RAID_HORN.value(), 4f, 1.2f);
         broadcast(w.getServer(), Text.literal("🏰 Основано: " + k.title + " · " + Races.of(k).title.toLowerCase()).formatted(k.color, Formatting.BOLD));
     }

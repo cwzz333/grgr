@@ -52,6 +52,8 @@ public final class ModelParts {
         c_fire_skull();
         c_jumpy_skull();
         c_hats();
+        c_guns();
+        c_cannon();
     }
 
     private static void c_crab() {
@@ -287,6 +289,20 @@ public final class ModelParts {
                 p("bandit_hood_biped", 3037, -1, 81.0f, 32.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, false),
                 p("bandit_hood_villager", 3038, -1, 81.0f, 32.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, false),
                 p("bandit_hood_tall", 3039, -1, 81.0f, 32.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, false),
+        }));
+    }
+
+    private static void c_guns() {
+        ALL.put("guns", new Creature("guns", 1.0f, false, false, new Part[]{
+                p("musket", 4000, -1, 0.0f, 8.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, false),
+                p("ball", 4001, -1, 14.0f, 8.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, false),
+        }));
+    }
+
+    private static void c_cannon() {
+        ALL.put("cannon", new Creature("cannon", 1.5f, false, false, new Part[]{
+                p("carriage", 4100, -1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, false),
+                p("barrel", 4101, -1, 0.0f, 9.5f, 1.0f, -10.0f, 0.0f, 0.0f, 1.0f, false, a(STRIKE, 0, -9.0f, 14.0f, 0.0f, ALWAYS, SIN)),
         }));
     }
 }

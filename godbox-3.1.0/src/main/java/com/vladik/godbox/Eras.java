@@ -21,7 +21,7 @@ import java.util.Map;
 /** 10 эпох. Каждая эпоха меняет облик всех зданий королевства. */
 public final class Eras {
     public static final String[] NAMES = {"Первобытная эпоха", "Каменный век", "Бронзовый век", "Железный век", "Античность",
-            "Раннее Средневековье", "Эпоха замков", "Возрождение", "Имперская эпоха", "Эпоха магии", "Эпоха пара"};
+            "Раннее Средневековье", "Эпоха замков", "Возрождение", "Имперская эпоха", "Эпоха Просвещения", "Эпоха пара"};
     public static final int CASTLE = 6;
     private static final Map<Block, Block[]> MAP = new HashMap<>();
 
@@ -33,26 +33,26 @@ public final class Eras {
 
     static {
         Block N = null;
-        row(of(Blocks.OAK_PLANKS, Blocks.SPRUCE_PLANKS, Blocks.BIRCH_PLANKS), Blocks.PACKED_MUD, Blocks.MUD_BRICKS, Blocks.TERRACOTTA, N, Blocks.SMOOTH_SANDSTONE, N, N, Blocks.CALCITE, Blocks.BRICKS, Blocks.PURPUR_BLOCK);
-        row(of(Blocks.OAK_LOG, Blocks.SPRUCE_LOG, Blocks.BIRCH_LOG, Blocks.STRIPPED_OAK_LOG), N, N, N, N, Blocks.QUARTZ_PILLAR, N, Blocks.STONE_BRICKS, Blocks.STRIPPED_DARK_OAK_LOG, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.AMETHYST_BLOCK);
-        row(of(Blocks.DARK_OAK_PLANKS), Blocks.HAY_BLOCK, Blocks.HAY_BLOCK, Blocks.ORANGE_TERRACOTTA, N, Blocks.RED_TERRACOTTA, N, N, Blocks.DEEPSLATE_TILES, Blocks.WAXED_OXIDIZED_CUT_COPPER, Blocks.PURPLE_TERRACOTTA);
-        row(of(Blocks.SPRUCE_SLAB, Blocks.DARK_OAK_SLAB, Blocks.OAK_SLAB, Blocks.BRICK_SLAB), Blocks.MOSS_CARPET, Blocks.MOSS_CARPET, Blocks.WAXED_CUT_COPPER_SLAB, N, Blocks.SMOOTH_SANDSTONE_SLAB, N, N, Blocks.DEEPSLATE_TILE_SLAB, Blocks.WAXED_OXIDIZED_CUT_COPPER_SLAB, Blocks.PURPUR_SLAB);
-        row(of(Blocks.COBBLESTONE), N, N, N, N, Blocks.SANDSTONE, N, Blocks.STONE_BRICKS, N, Blocks.DEEPSLATE_BRICKS, Blocks.END_STONE_BRICKS);
-        row(of(Blocks.MOSSY_COBBLESTONE), N, N, N, N, Blocks.CUT_SANDSTONE, N, Blocks.MOSSY_STONE_BRICKS, N, Blocks.CRACKED_DEEPSLATE_BRICKS, Blocks.PURPUR_PILLAR);
-        row(of(Blocks.STONE_BRICKS, Blocks.POLISHED_ANDESITE), Blocks.COBBLESTONE, Blocks.COBBLESTONE, Blocks.MUD_BRICKS, N, Blocks.CUT_SANDSTONE, N, N, Blocks.QUARTZ_BRICKS, Blocks.POLISHED_DEEPSLATE, Blocks.PURPUR_BLOCK);
-        row(of(Blocks.CHISELED_STONE_BRICKS), Blocks.MOSSY_COBBLESTONE, Blocks.MOSSY_COBBLESTONE, Blocks.TERRACOTTA, N, Blocks.CHISELED_SANDSTONE, N, N, Blocks.CHISELED_QUARTZ_BLOCK, Blocks.CHISELED_DEEPSLATE, Blocks.CRYING_OBSIDIAN);
+        row(of(Blocks.OAK_PLANKS, Blocks.SPRUCE_PLANKS, Blocks.BIRCH_PLANKS), Blocks.PACKED_MUD, Blocks.MUD_BRICKS, Blocks.TERRACOTTA, N, Blocks.SMOOTH_SANDSTONE, N, N, Blocks.CALCITE, Blocks.BRICKS, Blocks.BRICKS);
+        row(of(Blocks.OAK_LOG, Blocks.SPRUCE_LOG, Blocks.BIRCH_LOG, Blocks.STRIPPED_OAK_LOG), N, N, N, N, Blocks.QUARTZ_PILLAR, N, Blocks.STONE_BRICKS, Blocks.STRIPPED_DARK_OAK_LOG, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.DARK_OAK_LOG);
+        row(of(Blocks.DARK_OAK_PLANKS), Blocks.HAY_BLOCK, Blocks.HAY_BLOCK, Blocks.ORANGE_TERRACOTTA, N, Blocks.RED_TERRACOTTA, N, N, Blocks.DEEPSLATE_TILES, Blocks.WAXED_OXIDIZED_CUT_COPPER, Blocks.SPRUCE_PLANKS);
+        row(of(Blocks.SPRUCE_SLAB, Blocks.DARK_OAK_SLAB, Blocks.OAK_SLAB, Blocks.BRICK_SLAB), Blocks.MOSS_CARPET, Blocks.MOSS_CARPET, Blocks.WAXED_CUT_COPPER_SLAB, N, Blocks.SMOOTH_SANDSTONE_SLAB, N, N, Blocks.DEEPSLATE_TILE_SLAB, Blocks.WAXED_OXIDIZED_CUT_COPPER_SLAB, Blocks.BRICK_SLAB);
+        row(of(Blocks.COBBLESTONE), N, N, N, N, Blocks.SANDSTONE, N, Blocks.STONE_BRICKS, N, Blocks.DEEPSLATE_BRICKS, Blocks.STONE_BRICKS);
+        row(of(Blocks.MOSSY_COBBLESTONE), N, N, N, N, Blocks.CUT_SANDSTONE, N, Blocks.MOSSY_STONE_BRICKS, N, Blocks.CRACKED_DEEPSLATE_BRICKS, Blocks.STONE_BRICKS);
+        row(of(Blocks.STONE_BRICKS, Blocks.POLISHED_ANDESITE), Blocks.COBBLESTONE, Blocks.COBBLESTONE, Blocks.MUD_BRICKS, N, Blocks.CUT_SANDSTONE, N, N, Blocks.QUARTZ_BRICKS, Blocks.POLISHED_DEEPSLATE, Blocks.SMOOTH_STONE);
+        row(of(Blocks.CHISELED_STONE_BRICKS), Blocks.MOSSY_COBBLESTONE, Blocks.MOSSY_COBBLESTONE, Blocks.TERRACOTTA, N, Blocks.CHISELED_SANDSTONE, N, N, Blocks.CHISELED_QUARTZ_BLOCK, Blocks.CHISELED_DEEPSLATE, Blocks.CHISELED_QUARTZ_BLOCK);
         row(of(Blocks.BRICKS), Blocks.PACKED_MUD, Blocks.MUD_BRICKS, N, N, N, N, N, N, N, N);
-        row(of(Blocks.GLASS), Blocks.AIR, Blocks.AIR, N, N, N, N, N, N, Blocks.LIGHT_GRAY_STAINED_GLASS, Blocks.PURPLE_STAINED_GLASS);
-        row(of(Blocks.GLASS_PANE), Blocks.AIR, Blocks.AIR, N, N, N, N, N, N, Blocks.LIGHT_GRAY_STAINED_GLASS_PANE, Blocks.PURPLE_STAINED_GLASS_PANE);
-        row(of(Blocks.LANTERN), N, N, N, N, N, N, N, N, N, Blocks.SOUL_LANTERN);
-        row(of(Blocks.TORCH), N, N, N, N, N, N, N, N, N, Blocks.SOUL_TORCH);
-        row(of(Blocks.OAK_FENCE, Blocks.DARK_OAK_FENCE), N, N, N, N, Blocks.BIRCH_FENCE, N, N, N, Blocks.NETHER_BRICK_FENCE, Blocks.WARPED_FENCE);
-        row(of(Blocks.COBBLESTONE_WALL), N, N, N, N, Blocks.SANDSTONE_WALL, N, Blocks.STONE_BRICK_WALL, N, Blocks.DEEPSLATE_BRICK_WALL, Blocks.END_STONE_BRICK_WALL);
-        row(of(Blocks.STONE_BRICK_SLAB), Blocks.COBBLESTONE_SLAB, Blocks.COBBLESTONE_SLAB, Blocks.MUD_BRICK_SLAB, N, Blocks.SANDSTONE_SLAB, N, N, Blocks.QUARTZ_SLAB, Blocks.DEEPSLATE_BRICK_SLAB, Blocks.PURPUR_SLAB);
-        row(of(Blocks.SMOOTH_STONE), N, N, N, N, Blocks.SMOOTH_SANDSTONE, N, N, Blocks.SMOOTH_QUARTZ, Blocks.POLISHED_DEEPSLATE, Blocks.PURPUR_BLOCK);
-        row(of(Blocks.QUARTZ_BLOCK), Blocks.MUD_BRICKS, Blocks.MUD_BRICKS, Blocks.WHITE_TERRACOTTA, Blocks.CALCITE, N, N, N, N, N, Blocks.AMETHYST_BLOCK);
+        row(of(Blocks.GLASS), Blocks.AIR, Blocks.AIR, N, N, N, N, N, N, Blocks.LIGHT_GRAY_STAINED_GLASS, Blocks.GLASS);
+        row(of(Blocks.GLASS_PANE), Blocks.AIR, Blocks.AIR, N, N, N, N, N, N, Blocks.LIGHT_GRAY_STAINED_GLASS_PANE, Blocks.GLASS_PANE);
+        row(of(Blocks.LANTERN), N, N, N, N, N, N, N, N, N, N);
+        row(of(Blocks.TORCH), N, N, N, N, N, N, N, N, N, N);
+        row(of(Blocks.OAK_FENCE, Blocks.DARK_OAK_FENCE), N, N, N, N, Blocks.BIRCH_FENCE, N, N, N, Blocks.NETHER_BRICK_FENCE, Blocks.DARK_OAK_FENCE);
+        row(of(Blocks.COBBLESTONE_WALL), N, N, N, N, Blocks.SANDSTONE_WALL, N, Blocks.STONE_BRICK_WALL, N, Blocks.DEEPSLATE_BRICK_WALL, Blocks.STONE_BRICK_WALL);
+        row(of(Blocks.STONE_BRICK_SLAB), Blocks.COBBLESTONE_SLAB, Blocks.COBBLESTONE_SLAB, Blocks.MUD_BRICK_SLAB, N, Blocks.SANDSTONE_SLAB, N, N, Blocks.QUARTZ_SLAB, Blocks.DEEPSLATE_BRICK_SLAB, Blocks.QUARTZ_SLAB);
+        row(of(Blocks.SMOOTH_STONE), N, N, N, N, Blocks.SMOOTH_SANDSTONE, N, N, Blocks.SMOOTH_QUARTZ, Blocks.POLISHED_DEEPSLATE, Blocks.SMOOTH_QUARTZ);
+        row(of(Blocks.QUARTZ_BLOCK), Blocks.MUD_BRICKS, Blocks.MUD_BRICKS, Blocks.WHITE_TERRACOTTA, Blocks.CALCITE, N, N, N, N, N, N);
         row(of(Blocks.IRON_BARS), Blocks.OAK_FENCE, Blocks.OAK_FENCE, N, N, N, N, N, N, N, N);
-        row(of(Blocks.GOLD_BLOCK), Blocks.HAY_BLOCK, Blocks.BONE_BLOCK, Blocks.WAXED_COPPER_BLOCK, Blocks.IRON_BLOCK, N, N, N, N, N, Blocks.DIAMOND_BLOCK);
+        row(of(Blocks.GOLD_BLOCK), Blocks.HAY_BLOCK, Blocks.BONE_BLOCK, Blocks.WAXED_COPPER_BLOCK, Blocks.IRON_BLOCK, N, N, N, N, N, N);
     }
 
     // Эпоха пара (10): кирпич, базальтовые колонны, медные крыши, чернокаменная кладка, тёплые окна
@@ -117,7 +117,7 @@ public final class Eras {
                 p.add(new BlockPos(b.x1 + 1, top + 1, b.cz()), Blocks.LIGHTNING_ROD.getDefaultState());
             }
         } else if (b.kind == Civ.Kind.TOWER && e >= 8) {
-            p.add(new BlockPos(b.cx(), y0 + 7, b.cz()), (e == 9 ? Blocks.END_ROD : Blocks.BELL).getDefaultState());
+            p.add(new BlockPos(b.cx(), y0 + 7, b.cz()), (e == 9 ? Blocks.LANTERN : Blocks.BELL).getDefaultState());
         } else if (b.kind == Civ.Kind.BARRACKS && e >= 6) {
             p.add(new BlockPos(b.x0, y0 + 6, b.z0), Blocks.LANTERN.getDefaultState());
             p.add(new BlockPos(b.x1, y0 + 6, b.z1), Blocks.LANTERN.getDefaultState());
