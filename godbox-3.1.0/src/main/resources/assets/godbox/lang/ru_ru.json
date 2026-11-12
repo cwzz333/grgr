@@ -1,0 +1,11 @@
+{
+  "key.godbox.toggle": "Режим бога (WorldBox)",
+  "category.godbox": "GodBox",
+  "key.godbox.minimap": "Мини-карта",
+  "key.godbox.worldmap": "Карта мира",
+  "key.godbox.codex": "Кодекс сил",
+  "key.godbox.stats": "Статистика мира",
+  "key.godbox.help": "Справка",
+  "key.godbox.eras": "Выбор эпохи мира",
+  "item.godbox.model": "Деталь модели"
+}

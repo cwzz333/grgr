@@ -1,0 +1,1118 @@
+{
+ "parent": "minecraft:item/generated",
+ "textures": {
+  "layer0": "minecraft:item/barrier"
+ },
+ "overrides": [
+  {
+   "predicate": {
+    "custom_model_data": 1000
+   },
+   "model": "godbox:item/m/crab/body"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1001
+   },
+   "model": "godbox:item/m/crab/stalk_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1002
+   },
+   "model": "godbox:item/m/crab/eye_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1003
+   },
+   "model": "godbox:item/m/crab/stalk_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1004
+   },
+   "model": "godbox:item/m/crab/eye_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1005
+   },
+   "model": "godbox:item/m/crab/arm_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1006
+   },
+   "model": "godbox:item/m/crab/pincer_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1007
+   },
+   "model": "godbox:item/m/crab/finger_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1008
+   },
+   "model": "godbox:item/m/crab/arm_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1009
+   },
+   "model": "godbox:item/m/crab/pincer_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1010
+   },
+   "model": "godbox:item/m/crab/finger_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1011
+   },
+   "model": "godbox:item/m/crab/leg_l0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1012
+   },
+   "model": "godbox:item/m/crab/shin_l0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1013
+   },
+   "model": "godbox:item/m/crab/leg_l1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1014
+   },
+   "model": "godbox:item/m/crab/shin_l1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1015
+   },
+   "model": "godbox:item/m/crab/leg_l2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1016
+   },
+   "model": "godbox:item/m/crab/shin_l2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1017
+   },
+   "model": "godbox:item/m/crab/leg_l3"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1018
+   },
+   "model": "godbox:item/m/crab/shin_l3"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1019
+   },
+   "model": "godbox:item/m/crab/leg_r0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1020
+   },
+   "model": "godbox:item/m/crab/shin_r0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1021
+   },
+   "model": "godbox:item/m/crab/leg_r1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1022
+   },
+   "model": "godbox:item/m/crab/shin_r1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1023
+   },
+   "model": "godbox:item/m/crab/leg_r2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1024
+   },
+   "model": "godbox:item/m/crab/shin_r2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1025
+   },
+   "model": "godbox:item/m/crab/leg_r3"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1026
+   },
+   "model": "godbox:item/m/crab/shin_r3"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1100
+   },
+   "model": "godbox:item/m/robot/pelvis"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1101
+   },
+   "model": "godbox:item/m/robot/torso"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1102
+   },
+   "model": "godbox:item/m/robot/reactor"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1103
+   },
+   "model": "godbox:item/m/robot/head"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1104
+   },
+   "model": "godbox:item/m/robot/visor"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1105
+   },
+   "model": "godbox:item/m/robot/arm_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1106
+   },
+   "model": "godbox:item/m/robot/forearm_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1107
+   },
+   "model": "godbox:item/m/robot/fist_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1108
+   },
+   "model": "godbox:item/m/robot/arm_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1109
+   },
+   "model": "godbox:item/m/robot/cannon"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1110
+   },
+   "model": "godbox:item/m/robot/muzzle"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1111
+   },
+   "model": "godbox:item/m/robot/leg_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1112
+   },
+   "model": "godbox:item/m/robot/shin_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1113
+   },
+   "model": "godbox:item/m/robot/foot_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1114
+   },
+   "model": "godbox:item/m/robot/leg_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1115
+   },
+   "model": "godbox:item/m/robot/shin_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1116
+   },
+   "model": "godbox:item/m/robot/foot_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1200
+   },
+   "model": "godbox:item/m/titan/torso"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1201
+   },
+   "model": "godbox:item/m/titan/runes"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1202
+   },
+   "model": "godbox:item/m/titan/core"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1203
+   },
+   "model": "godbox:item/m/titan/head"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1204
+   },
+   "model": "godbox:item/m/titan/eyes"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1205
+   },
+   "model": "godbox:item/m/titan/arm_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1206
+   },
+   "model": "godbox:item/m/titan/fore_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1207
+   },
+   "model": "godbox:item/m/titan/band_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1208
+   },
+   "model": "godbox:item/m/titan/arm_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1209
+   },
+   "model": "godbox:item/m/titan/fore_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1210
+   },
+   "model": "godbox:item/m/titan/band_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1211
+   },
+   "model": "godbox:item/m/titan/leg_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1212
+   },
+   "model": "godbox:item/m/titan/shin_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1213
+   },
+   "model": "godbox:item/m/titan/knee_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1214
+   },
+   "model": "godbox:item/m/titan/leg_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1215
+   },
+   "model": "godbox:item/m/titan/shin_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1216
+   },
+   "model": "godbox:item/m/titan/knee_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1300
+   },
+   "model": "godbox:item/m/dragon/body"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1301
+   },
+   "model": "godbox:item/m/dragon/neck0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1302
+   },
+   "model": "godbox:item/m/dragon/neck1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1303
+   },
+   "model": "godbox:item/m/dragon/neck2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1304
+   },
+   "model": "godbox:item/m/dragon/head"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1305
+   },
+   "model": "godbox:item/m/dragon/jaw"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1306
+   },
+   "model": "godbox:item/m/dragon/eyes"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1307
+   },
+   "model": "godbox:item/m/dragon/tail0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1308
+   },
+   "model": "godbox:item/m/dragon/tail1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1309
+   },
+   "model": "godbox:item/m/dragon/tail2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1310
+   },
+   "model": "godbox:item/m/dragon/tail3"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1311
+   },
+   "model": "godbox:item/m/dragon/tail_tip"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1312
+   },
+   "model": "godbox:item/m/dragon/hind_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1313
+   },
+   "model": "godbox:item/m/dragon/shin_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1314
+   },
+   "model": "godbox:item/m/dragon/hind_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1315
+   },
+   "model": "godbox:item/m/dragon/shin_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1316
+   },
+   "model": "godbox:item/m/dragon/wing_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1317
+   },
+   "model": "godbox:item/m/dragon/wingtip_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1318
+   },
+   "model": "godbox:item/m/dragon/wing_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1319
+   },
+   "model": "godbox:item/m/dragon/wingtip_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1400
+   },
+   "model": "godbox:item/m/kraken/body"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1401
+   },
+   "model": "godbox:item/m/kraken/beak"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1402
+   },
+   "model": "godbox:item/m/kraken/eye_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1403
+   },
+   "model": "godbox:item/m/kraken/fin_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1404
+   },
+   "model": "godbox:item/m/kraken/eye_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1405
+   },
+   "model": "godbox:item/m/kraken/fin_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1406
+   },
+   "model": "godbox:item/m/kraken/tent0_0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1407
+   },
+   "model": "godbox:item/m/kraken/tent0_1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1408
+   },
+   "model": "godbox:item/m/kraken/tent0_2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1409
+   },
+   "model": "godbox:item/m/kraken/tent1_0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1410
+   },
+   "model": "godbox:item/m/kraken/tent1_1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1411
+   },
+   "model": "godbox:item/m/kraken/tent1_2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1412
+   },
+   "model": "godbox:item/m/kraken/tent2_0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1413
+   },
+   "model": "godbox:item/m/kraken/tent2_1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1414
+   },
+   "model": "godbox:item/m/kraken/tent2_2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1415
+   },
+   "model": "godbox:item/m/kraken/tent3_0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1416
+   },
+   "model": "godbox:item/m/kraken/tent3_1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1417
+   },
+   "model": "godbox:item/m/kraken/tent3_2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1418
+   },
+   "model": "godbox:item/m/kraken/tent4_0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1419
+   },
+   "model": "godbox:item/m/kraken/tent4_1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1420
+   },
+   "model": "godbox:item/m/kraken/tent4_2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1421
+   },
+   "model": "godbox:item/m/kraken/tent5_0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1422
+   },
+   "model": "godbox:item/m/kraken/tent5_1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1423
+   },
+   "model": "godbox:item/m/kraken/tent5_2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1424
+   },
+   "model": "godbox:item/m/kraken/tent6_0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1425
+   },
+   "model": "godbox:item/m/kraken/tent6_1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1426
+   },
+   "model": "godbox:item/m/kraken/tent6_2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1427
+   },
+   "model": "godbox:item/m/kraken/tent7_0"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1428
+   },
+   "model": "godbox:item/m/kraken/tent7_1"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1429
+   },
+   "model": "godbox:item/m/kraken/tent7_2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1500
+   },
+   "model": "godbox:item/m/ufo/hull"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1501
+   },
+   "model": "godbox:item/m/ufo/dome"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1502
+   },
+   "model": "godbox:item/m/ufo/ring"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1503
+   },
+   "model": "godbox:item/m/ufo/emitter"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1600
+   },
+   "model": "godbox:item/m/crystal_golem/body"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1601
+   },
+   "model": "godbox:item/m/crystal_golem/core"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1602
+   },
+   "model": "godbox:item/m/crystal_golem/crystals_back"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1603
+   },
+   "model": "godbox:item/m/crystal_golem/head"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1604
+   },
+   "model": "godbox:item/m/crystal_golem/eyes"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1605
+   },
+   "model": "godbox:item/m/crystal_golem/arm_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1606
+   },
+   "model": "godbox:item/m/crystal_golem/forearm_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1607
+   },
+   "model": "godbox:item/m/crystal_golem/arm_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1608
+   },
+   "model": "godbox:item/m/crystal_golem/forearm_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1609
+   },
+   "model": "godbox:item/m/crystal_golem/leg_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1610
+   },
+   "model": "godbox:item/m/crystal_golem/leg_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1700
+   },
+   "model": "godbox:item/m/fire_elemental/body"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1701
+   },
+   "model": "godbox:item/m/fire_elemental/core"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1702
+   },
+   "model": "godbox:item/m/fire_elemental/head"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1703
+   },
+   "model": "godbox:item/m/fire_elemental/crest"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1704
+   },
+   "model": "godbox:item/m/fire_elemental/tail"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1705
+   },
+   "model": "godbox:item/m/fire_elemental/tail2"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1706
+   },
+   "model": "godbox:item/m/fire_elemental/arm_l"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1707
+   },
+   "model": "godbox:item/m/fire_elemental/arm_r"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1708
+   },
+   "model": "godbox:item/m/fire_elemental/shards"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1800
+   },
+   "model": "godbox:item/m/fire_skull/skull"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1801
+   },
+   "model": "godbox:item/m/fire_skull/jaw"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1802
+   },
+   "model": "godbox:item/m/fire_skull/flames"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1900
+   },
+   "model": "godbox:item/m/jumpy_skull/skull"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1901
+   },
+   "model": "godbox:item/m/jumpy_skull/jaw"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 1902
+   },
+   "model": "godbox:item/m/jumpy_skull/glow"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3000
+   },
+   "model": "godbox:item/m/hats/crown"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3001
+   },
+   "model": "godbox:item/m/hats/hero_helmet"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3002
+   },
+   "model": "godbox:item/m/hats/legend_helmet"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3003
+   },
+   "model": "godbox:item/m/hats/mage_hat"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3004
+   },
+   "model": "godbox:item/m/hats/necro_hood"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3005
+   },
+   "model": "godbox:item/m/hats/evil_mage_hat"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3006
+   },
+   "model": "godbox:item/m/hats/white_circlet"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3007
+   },
+   "model": "godbox:item/m/hats/plague_mask"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3008
+   },
+   "model": "godbox:item/m/hats/druid_crown"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3009
+   },
+   "model": "godbox:item/m/hats/bandit_hood"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3010
+   },
+   "model": "godbox:item/m/hats/crown_biped"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3011
+   },
+   "model": "godbox:item/m/hats/crown_villager"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3012
+   },
+   "model": "godbox:item/m/hats/crown_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3013
+   },
+   "model": "godbox:item/m/hats/hero_helmet_biped"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3014
+   },
+   "model": "godbox:item/m/hats/hero_helmet_villager"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3015
+   },
+   "model": "godbox:item/m/hats/hero_helmet_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3016
+   },
+   "model": "godbox:item/m/hats/legend_helmet_biped"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3017
+   },
+   "model": "godbox:item/m/hats/legend_helmet_villager"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3018
+   },
+   "model": "godbox:item/m/hats/legend_helmet_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3019
+   },
+   "model": "godbox:item/m/hats/mage_hat_biped"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3020
+   },
+   "model": "godbox:item/m/hats/mage_hat_villager"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3021
+   },
+   "model": "godbox:item/m/hats/mage_hat_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3022
+   },
+   "model": "godbox:item/m/hats/necro_hood_biped"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3023
+   },
+   "model": "godbox:item/m/hats/necro_hood_villager"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3024
+   },
+   "model": "godbox:item/m/hats/necro_hood_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3025
+   },
+   "model": "godbox:item/m/hats/evil_mage_hat_biped"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3026
+   },
+   "model": "godbox:item/m/hats/evil_mage_hat_villager"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3027
+   },
+   "model": "godbox:item/m/hats/evil_mage_hat_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3028
+   },
+   "model": "godbox:item/m/hats/white_circlet_biped"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3029
+   },
+   "model": "godbox:item/m/hats/white_circlet_villager"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3030
+   },
+   "model": "godbox:item/m/hats/white_circlet_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3031
+   },
+   "model": "godbox:item/m/hats/plague_mask_biped"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3032
+   },
+   "model": "godbox:item/m/hats/plague_mask_villager"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3033
+   },
+   "model": "godbox:item/m/hats/plague_mask_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3034
+   },
+   "model": "godbox:item/m/hats/druid_crown_biped"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3035
+   },
+   "model": "godbox:item/m/hats/druid_crown_villager"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3036
+   },
+   "model": "godbox:item/m/hats/druid_crown_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3037
+   },
+   "model": "godbox:item/m/hats/bandit_hood_biped"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3038
+   },
+   "model": "godbox:item/m/hats/bandit_hood_villager"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 3039
+   },
+   "model": "godbox:item/m/hats/bandit_hood_tall"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 4000
+   },
+   "model": "godbox:item/m/guns/musket"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 4001
+   },
+   "model": "godbox:item/m/guns/ball"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 4100
+   },
+   "model": "godbox:item/m/cannon/carriage"
+  },
+  {
+   "predicate": {
+    "custom_model_data": 4101
+   },
+   "model": "godbox:item/m/cannon/barrel"
+  }
+ ]
+}
